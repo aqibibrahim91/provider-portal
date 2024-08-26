@@ -23,6 +23,11 @@ import PrintComponentPages from "./PrintForm2";
 import { apiClient } from "@/app/api";
 import Loader from "./loader";
 import PrintParentComponent from "./PrintParentComponent";
+import {
+  addClaimNumber,
+  editCaseActive,
+} from "../components/EditInvoiceSlice";
+
 function InsertClaim({
   session,
   InsertClaim,
@@ -58,6 +63,7 @@ function InsertClaim({
   const [tableData, setTableData] = useState("");
   const id = session?.user?.email;
   const token = session?.user?.image;
+  const [claimNumberInput, setClaimNumberInput] = useState("");
   const [formState, setFormState] = useState({
     invoiceNumber: "",
     treatmentDate: null,
@@ -91,6 +97,7 @@ function InsertClaim({
     const [month, day, year] = date.split("/");
     return `${year}-${month?.padStart(2, "0")}-${day?.padStart(2, "0")}`;
   };
+
 
   useEffect(() => {
     if (claimNumber) {
@@ -605,6 +612,9 @@ function InsertClaim({
     fetchMedicalServices();
 
   };
+  const isActive = () => {
+    return (data.employmentStatus == "Active")
+  }
   const columns = [
     {
       title: "Invoice#",
@@ -657,34 +667,38 @@ function InsertClaim({
       dataIndex: "",
       key: "keyRef",
     },
-    data?.isSubmitted === null
+    data?.isSubmitted === null && isActive()
       ? {
         title: "Actions", // Added title for the actions column
         key: "action",
-        render: (_, record) => (
-          <Space size="middle">
-            <a>
-              {selectedRow === record.keyRef && edit ? (
-                <X
-                  className="text-[#2B3F6C]"
-                  onClick={() => handleEditClickEnd(record)}
-                />
-              ) : (
-                <SquarePen
-                  className="text-[#2B3F6C]"
-                  onClick={() => handleEditClick(record)}
-                />
-              )}
-            </a>{" "}
-            <a>
-              <Trash2
-                className="text-red
+        render: (_, record) => {
+          isActive() && (
+            <Space size="middle">
+              <a>
+                {selectedRow === record.keyRef && edit ? (
+                  <X
+                    className="text-[#2B3F6C]"
+                    onClick={() => handleEditClickEnd(record)}
+                  />
+                ) : (
+                  <SquarePen
+                    className="text-[#2B3F6C]"
+                    onClick={() => handleEditClick(record)}
+                  />
+                )}
+              </a>{" "}
+              <a>
+                <Trash2
+                  className="text-red
                   "
-                onClick={() => handleDeleteClick(record)}
-              />
-            </a>{" "}
-          </Space>
-        ),
+                  onClick={() => handleDeleteClick(record)}
+                />
+              </a>{" "}
+            </Space>
+          )
+        }
+
+        ,
       }
       : {},
   ];
@@ -724,13 +738,44 @@ function InsertClaim({
   const handleDataChange = (pagination) => {
     setPageIndex(pagination.current)
   }
+  const handleClaimNumberChange = (e) => {
+    const value = e.target.value;
+    setClaimNumberInput(value);
+  };
   return (
     <>
       <Loader loading={loading} />
       {" "}
       {!printClaim ? (
-        <div className="flex w-full">
-          {data && !loading ? (
+        <div className="mt-[10px] flex flex-col w-full">
+          <div className="font-medium text-2xl">Search User ID</div>
+          <div className="flex mt-2 pr-[60px] ">
+            <div className="flex justify-between w-full ">
+              <div className="flex">
+                <Input
+                  type="text"
+                  placeholder="Search Claim Number"
+                  value={claimNumberInput}
+                  onChange={handleClaimNumberChange}
+                  className="h-12 w-[270px] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
+                />
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  className="bg-[#113493] border-none ml-2.5 text-white h-[46px] w-[46px] font-inter"
+                  onClick={() => {
+                    dispatch(editCaseActive());
+                    dispatch(addClaimNumber(claimNumberInput));
+                  }}
+                  loading={loading}
+                >
+                  <Search className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {data && !loading && (
             <div className="ml-1 w-full lg:pr-[60px]  ">
               <div className="flex  items-center align-middle justify-between pr-5 lg:pr-auto">
                 <div className="font-medium text-2xl flex">Insert Claim</div>
@@ -757,6 +802,7 @@ function InsertClaim({
                       type="primary"
                       htmlType="submit"
                       onClick={() => submitClaim()}
+                      disabled={!isActive()}
                       className="bg-[#113493] w-[160px] border-none ml-2.5 text-white h-[48px] font-inter font-semibold text-base"
                     >
                       Submit Claim
@@ -794,7 +840,7 @@ function InsertClaim({
                           </div>
                         </div>
                         <div className="flex gap-2.5 ">
-                          <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] w-[50px] h-[28px] rounded-md align-middle items-center">
+                          <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] w-[65px] h-[28px] rounded-md align-middle items-center">
                             <p className="text-sm font-medium text-white">
                               {" "}
                               {data?.gender}
@@ -810,14 +856,16 @@ function InsertClaim({
                               ""
                             )}{" "}
                           </div>{" "}
-                          <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] w-20 h-[28px] rounded-md align-middle items-center">
-                            {data?.employmentStatus ? (
+                          <div className="flex justify-center bg-[#3056D3] px-2 py-[3px] w-24 h-[28px] rounded-md align-middle items-center">
+                            {data?.outPatient ? (
+                              <p className="text-sm font-medium text-white">
+                                Out Patient
+                              </p>
+                            ) : (
                               <p className="text-sm font-medium text-white">
                                 {" "}
                                 In Patient
                               </p>
-                            ) : (
-                              ""
                             )}
                           </div>{" "}
                         </div>
@@ -1046,6 +1094,7 @@ function InsertClaim({
                               <Button
                                 type="primary"
                                 htmlType="submit"
+                                disabled={!isActive()}
                                 className="bg-[#113493] border-none w-full  text-white h-[48px] font-inter font-semibold text-base"
                               >
                                 <ReceiptText />
@@ -1078,12 +1127,6 @@ function InsertClaim({
                   />
                 </div>{" "}
               </>
-            </div>
-          ) : (
-            <div className="w-full  flex  align-middle justify-center  items-center">
-              <p className="text-lg font-semibold ">
-                Data Not Found Please use some other Claim Number
-              </p>
             </div>
           )}
         </div>

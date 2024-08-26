@@ -89,8 +89,8 @@ const Limits = ({ session }) => {
           item.status === 0
             ? "Under Review"
             : item.status === 1
-            ? "Completed"
-            : "Rejected",
+              ? "Completed"
+              : "Rejected",
       })) || []
     );
   };
@@ -114,23 +114,13 @@ const Limits = ({ session }) => {
         </Button>
       </div>
       <div className="mt-[22px]">
-        {dataResponse ? (
+        {dataResponse && (
           <Table
             columns={columns}
             dataSource={data}
             pagination={false}
             className="w-1/3"
           />
-        ) : (
-          <div className="flex items-center m-auto flex-col justify-center mt-44 w-full">
-            <div className="flex font-medium  flex-col text-xl font-inter justify-center ">
-              No data available, please use Search
-            </div>{" "}
-            <Image
-              src={noData}
-              className="w-56 h-56 mt-3 flex justify-center"
-            />
-          </div>
         )}
       </div>
     </div>

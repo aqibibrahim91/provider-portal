@@ -118,6 +118,9 @@ function IDSearch({
     const value = e.target.value;
     setAssuredID(value);
   };
+  const isActive = () => {
+    return (data.employmentStatus == "Active" && data.policyStatus == "Actove")
+  }
 
   return (
     <div className="mt-[10px] flex flex-col w-full">
@@ -157,6 +160,7 @@ function IDSearch({
               <Button
                 type="primary"
                 htmlType="submit"
+                disabled={!isActive()}
                 onClick={() => handleInsertClick()}
                 className="bg-[#113493] w-[160px] border-none ml-2.5 text-white h-[48px] font-inter font-semibold text-base"
               >
@@ -167,7 +171,7 @@ function IDSearch({
         </div>
       </div>
 
-      {data ? (
+      {data && (
         <div className="ml-1 w-full lg:pr-[60px] pr-[65px] ">
           <div className="flex items-center justify-between"></div>
           <div className=" mt-5 lg:mt-[10px] border border-[#E7E7E7] bg-white flex flex-col">
@@ -310,13 +314,6 @@ function IDSearch({
               Find Limits
             </Button>
           </div>
-        </div>
-      ) : (
-        <div className="flex items-center m-auto flex-col justify-center mt-44 w-full">
-          <div className="flex font-medium  flex-col text-xl font-inter justify-center ">
-            No data available, please use Search
-          </div>{" "}
-          <Image src={noData} className="w-56 h-56 mt-3 flex justify-center"alt="mo-data" />
         </div>
       )}
     </div>

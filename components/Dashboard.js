@@ -58,12 +58,13 @@ export default function Dashboard({ setDetailsBit, detailsBit, session }) {
 
         const result = JSON.parse(text);
         const transformedData = transformData(result?.successResponse);
+        
 
         setData(transformedData);
         setPagination({
           current: page,
           pageSize,
-          total: result?.totalRecords || 0,
+          total: result?.totalCount || 0,
         });
 
         if (result && result.providerID) {
