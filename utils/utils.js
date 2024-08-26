@@ -53,7 +53,10 @@ export const TableData = [
   },
 ];
 export const formatDate = (dateString) => {
-  const options = { year: "numeric", month: "numeric", day: "numeric" };
   const date = new Date(dateString);
-  return date.toLocaleDateString(undefined, options);
+  
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 };

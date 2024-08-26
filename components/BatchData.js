@@ -164,7 +164,7 @@ function BatchData({ batch, setBatch, batchNumber, session }) {
           <div className="flex font-medium  flex-col text-xl font-inter justify-center ">
             No data available
           </div>{" "}
-          <Image src={noData} className="w-56 h-56 mt-3 flex justify-center" />
+          <Image src={noData} className="w-56 h-56 mt-3 flex justify-center" alt="no-data" />
           <div className="flex items-center">
             <Button
               type="primary"

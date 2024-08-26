@@ -4,12 +4,16 @@ import ReactToPrint from "react-to-print";
 import bottom from "../public/images/bottom.png";
 import Image from "next/image";
 import Barcode from "react-barcode";
+import logo from "../public/images/form-logo.jpg";
+
 const PrintComponent = ({ setFormTwo, data }) => {
   const componentRef = useRef();
 
   const formatDate = (date) => {
-    const options = { day: '2-digit', month: 'short', year: 'numeric' };
-    return date.toLocaleDateString('en-GB', options).replace(/\//g, '-');
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
   const getCurrentDate = () => {
     const today = new Date();
@@ -60,16 +64,28 @@ const PrintComponent = ({ setFormTwo, data }) => {
           className="w-[1200px] flex flex-col px-10 pt-3 "
           style={{ direction: "rtl", fontFamily: "inter" }}
         >
-          <div className="flex w-full justify-between items-center flex">
-            <div className="flex">
-              <div className="arabic text-sm text-[#348eca] mt-[26px]">
-                {data?.batchNumber}
+          <div className="flex w-full justify-between items-center">
+            <div className="flex-1 text-right">
+              <div className="justify-right arabic text-sm flex text-[#348eca]">
+                <Image
+                  alt="mo-data"
+                  src={logo}
+                  height={100}
+                  width={100}
+                  className="flex max-h-[50px] rounded-md mt-1"
+                />
               </div>
-              <div className="text-[#348eca]">
+
+            </div>
+            <div className="flex-1 text-center">
+              <div className="arabic text-sm text-[#348eca] mt-[26px]">
+                Batch Number: {data?.batchNumber}
+              </div>
+              <div className="text-[#348eca] flex justify-center">
                 <Barcode value={data?.claimNumber} className="h-[80px] w-[200px] barcode" />
               </div>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 text-left">
               <div className="arabic text-xs flex justify-end text-[#348eca]">
                 نموذج معالجة
               </div>
@@ -86,11 +102,7 @@ const PrintComponent = ({ setFormTwo, data }) => {
               </div>
             </div>
           </div>
-          {/* <div className="flex w-full  justify-end">
-            <div>
-              
-            </div>
-          </div> */}
+
           <div className="w-full py-1 border-t-8 gap-4 px-2 border flex border-[#348eca] placeholder:text-[#348eca] border-t-gray-600 ">
             <div className="w-1/2  gap-1 flex flex-col">
               <input
@@ -100,12 +112,12 @@ const PrintComponent = ({ setFormTwo, data }) => {
               <input
                 className="border px-1 text-[#348eca] border-[#348eca] placeholder:text-[#348eca] w-full text-[10px] py-1 arabic"
                 placeholder="اسم المشترك"
-                value={data?.assuredName}
+                value={"اسم المشترك: " + data?.assuredName}
               />
               <input
                 className="border px-1 text-[#348eca] border-[#348eca] placeholder:text-[#348eca] w-full text-[10px] py-1 arabic"
                 placeholder="اسم المريض"
-                value={data?.assuredName + "-" + data?.assuredID}
+                value={"اسم المريض: " + data?.assuredName + "-" + data?.assuredID}
               />
               <input
                 className="border px-1 text-[#348eca] border-[#348eca] placeholder:text-[#348eca] w-full text-[10px] py-1 arabic"
@@ -120,12 +132,12 @@ const PrintComponent = ({ setFormTwo, data }) => {
               <input
                 className="border px-1 text-[#348eca] border-[#348eca] placeholder:text-[#348eca] w-full text-[10px] py-1 arabic"
                 placeholder="تاريخ زيارة الطبيب."
-                value={getCurrentDate()}
+                value={"تاريخ زيارة الطبيب: " + getCurrentDate()}
               />
               <input
                 className="border px-1 text-[#348eca] border-[#348eca] placeholder:text-[#348eca] w-full text-[10px] py-1 arabic"
                 placeholder="عمر المريض"
-                value={getAge()}
+                value={"عمر المريض: " + getAge()}
               />
               <input
                 className="border px-1 text-[#348eca] border-[#348eca] placeholder:text-[#348eca] w-full text-[10px] py-1 arabic"
@@ -951,7 +963,7 @@ const PrintComponent = ({ setFormTwo, data }) => {
             </div>{" "}
           </div>
         </div>
-        <Image src={bottom} className="w-full flex justify-end " />
+        <Image src={bottom} className="w-full flex justify-end " alt="mo-data" />
       </div>
     </div>
   );

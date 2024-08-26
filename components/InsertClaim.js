@@ -204,7 +204,7 @@ function InsertClaim({
             }))
           }
         }
-        
+
       } else {
         console.error("Request was not successful:", data.errorDetail);
         setProviderMedicalServices(null);
@@ -237,6 +237,7 @@ function InsertClaim({
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const apiUrl = edit
       ? `${process.env.NEXT_PUBLIC_API_URL}/api/Claim/UpdateClaim`
       : `${process.env.NEXT_PUBLIC_API_URL}/api/Claim/InsertInvoice`;
@@ -259,39 +260,59 @@ function InsertClaim({
       requestBody.assuredID = data?.assuredID
     }
 
+    if (validateRequest(requestBody)) {
+      setLoading(true)
+      const response = await apiClient(apiUrl, {
+        method: "POST",
+        headers: {
+          "ngrok-skip-browser-warning": true,
+          "Content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+      setLoading(false)
+      const text = await response.json();
 
+      if (text?.successResponse) {
+        setClaimLoad(true);
+        setInvoiceSubmitted(!invoiceSubmitted)
+        edit
+          ? toast.success("Claim updated Successfully")
+          : toast.success("Claim Added Successfully");
+        setEdit(false);
+        setEditInvoiceBit(false)
+        setFormState("");
+        setIsNotAvailable(false)
 
-    const response = await apiClient(apiUrl, {
-      method: "POST",
-      headers: {
-        "ngrok-skip-browser-warning": true,
-        "Content-type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(requestBody),
-    });
-    const text = await response.json();
-
-    if (text?.successResponse) {
-      setClaimLoad(true);
-      setInvoiceSubmitted(!invoiceSubmitted)
-      edit
-        ? toast.success("Claim updated Successfully")
-        : toast.success("Claim Added Successfully");
-      setEdit(false);
-      setEditInvoiceBit(false)
-      setFormState("");
-      setIsNotAvailable(false)
-
-      //   // setFormState("");
-    } else {
+        //   // setFormState("");
+      } else {
+        setClaimLoad(false);
+        console.warn("Assured ID is required");
+      }
       setClaimLoad(false);
-      console.warn("Assured ID is required");
     }
-    setClaimLoad(false);
-
-    console.log("Form Data Submitted:", formState);
+    else {
+      toast.error("Please fill in all the fields!", { id: 1 })
+    }
   };
+  const isInvalidValue = (value) => {
+    return value === null || value === undefined || value === "";
+  };
+  const validateRequest = (request) => {
+    if (
+      isInvalidValue(request.invoiceNumber) ||
+      isInvalidValue(request.treatmentDate) ||
+      isInvalidValue(request.medicalService) ||
+      isInvalidValue(request.gross)
+    ) {
+      return false; // Return false if any value is invalid
+    }
+
+    // If all properties are valid
+    return true;
+
+  }
 
   useEffect(() => {
     setInsertClaim(false);
@@ -370,83 +391,81 @@ function InsertClaim({
 
   useEffect(() => {
     if (!claimNo) return;
-
-    const fetchMedicalServices = async () => {
-      if (!claimNo) return;
-
-      try {
-        const response = await apiClient(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/Claim/GetMedicalServices?providerID=${id}`,
-          {
-            method: "GET",
-            headers: {
-              "ngrok-skip-browser-warning": true,
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (data.isRequestSuccessful) {
-          // Transform the data to fit the Select component format
-          const options = data.successResponse.map((service) => ({
-            value: service.accntNum,
-            label: service.accntNam,
-          }));
-
-          setMedicalServices(options);
-        } else {
-          console.error("Request was not successful:", data.errorDetail);
-        }
-      } catch (error) {
-        console.error("apiClient error:", error);
-      } finally {
-      }
-    };
-    const fetchProviderMedicalServices = async () => {
-      if (!claimNo) return;
-
-      try {
-        const response = await apiClient(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/Claim/GetProviderMedicalService?providerID=${id}`,
-          {
-            method: "GET",
-            headers: {
-              "ngrok-skip-browser-warning": true,
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (data.isRequestSuccessful) {
-          // Transform the data to fit the Select component format
-          const options = data.successResponse.map((service) => ({
-            value: service.medicalService,
-            price: service?.price,
-            label: `${service.medicalServiceName} `, // Include price in the label
-          }));
-          setProviderMedicalServices(options);
-        } else {
-          console.error("Request was not successful:", data.errorDetail);
-        }
-      } catch (error) {
-        console.error("apiClient error:", error);
-      }
-    };
-
     fetchProviderMedicalServices();
     fetchMedicalServices();
-  }, [claimNo]);
+  }, [claimNo, invoiceSubmitted]);
+  const fetchMedicalServices = async () => {
+    if (!claimNo) return;
+
+    try {
+      const response = await apiClient(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/Claim/GetMedicalServices?providerID=${id}`,
+        {
+          method: "GET",
+          headers: {
+            "ngrok-skip-browser-warning": true,
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.isRequestSuccessful) {
+        // Transform the data to fit the Select component format
+        const options = data.successResponse.map((service) => ({
+          value: service.accntNum,
+          label: service.accntNam,
+        }));
+
+        setMedicalServices(options);
+      } else {
+        console.error("Request was not successful:", data.errorDetail);
+      }
+    } catch (error) {
+      console.error("apiClient error:", error);
+    } finally {
+    }
+  };
+  const fetchProviderMedicalServices = async () => {
+    if (!claimNo) return;
+
+    try {
+      const response = await apiClient(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/Claim/GetProviderMedicalService?providerID=${id}`,
+        {
+          method: "GET",
+          headers: {
+            "ngrok-skip-browser-warning": true,
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.isRequestSuccessful) {
+        // Transform the data to fit the Select component format
+        const options = data.successResponse.map((service) => ({
+          value: service.medicalService,
+          price: service?.price,
+          label: `${service.medicalServiceName} `, // Include price in the label
+        }));
+        setProviderMedicalServices(options);
+      } else {
+        console.error("Request was not successful:", data.errorDetail);
+      }
+    } catch (error) {
+      console.error("apiClient error:", error);
+    }
+  };
 
   const fetchData = async () => {
     if (session) {
@@ -546,8 +565,8 @@ function InsertClaim({
   };
   const handleConfirmDelete = async (record) => {
     const token = session?.user?.image;
-
     try {
+      setLoading(true);
       const response = await apiClient(
         `${process.env.NEXT_PUBLIC_API_URL}/api/Claim/DeleteClaimData?claimNumber=${record.claims}&keyRef=${record?.keyRef}`,
         {
@@ -574,6 +593,7 @@ function InsertClaim({
     } catch (error) {
       console.error("apiClient error:", error);
     } finally {
+      setLoading(false)
       handleCloseModal();
     }
   };
@@ -581,6 +601,9 @@ function InsertClaim({
     setEdit(false);
     // setEditInvoiceBit(false)
     setFormState("");
+    fetchProviderMedicalServices();
+    fetchMedicalServices();
+
   };
   const columns = [
     {
@@ -598,11 +621,26 @@ function InsertClaim({
       title: "Provider Medical Service",
       dataIndex: "Provider",
       key: "Provider",
+      render: (_, record) => {
+        return (
+          <>{record.Provider ? record.Provider : "-"}</>
+        )
+      }
     },
     {
       title: "Medical Service",
       dataIndex: "MedicalService",
       key: "MedicalService",
+    },
+    {
+      title: "Note",
+      dataIndex: "note",
+      key: "note",
+      render: (_, record) => {
+        return (
+          <>{record.note ? record.note : "-"}</>
+        )
+      }
     },
     {
       title: "Gross",
@@ -738,6 +776,7 @@ function InsertClaim({
                       <div className="flex w-full">
                         {" "}
                         <Image
+                          alt="mo-data"
                           src={Avatar}
                           height={50}
                           width={50}
@@ -895,7 +934,6 @@ function InsertClaim({
                                 </div>
                                 <input
                                   type="date"
-                                  required
                                   className="h-12 mt-3 px-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
                                   value={formatDatee(formState.treatmentDate)}
                                   onChange={(e) => {
@@ -905,6 +943,7 @@ function InsertClaim({
                                     }));
                                   }}
                                   max={new Date().toLocaleDateString('en-CA')}
+                                  min={new Date("2000-01-01").toLocaleDateString('en-CA')}
                                 />
                               </div>
                             </div>
@@ -973,7 +1012,6 @@ function InsertClaim({
                                 value={formState.gross}
                                 placeholder="Enter Gross"
                                 className="h-12 px-3  mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
-                                required
                                 onChange={handleChange}
                                 min={0}
                               />

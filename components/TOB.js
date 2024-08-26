@@ -167,7 +167,7 @@ function TOB({ session }) {
           <div className="flex font-medium  flex-col text-xl py-4 font-inter justify-center ">
             No data available, please use Search
           </div>{" "}
-          <Image src={noData} className="w-56 h-56 mt-3 flex justify-center" />
+          <Image src={noData} className="w-56 h-56 mt-3 flex justify-center" alt="mo-data"  />
         </div>
       )}
     </div>

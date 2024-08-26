@@ -4,8 +4,10 @@ import ReactToPrint from "react-to-print";
 import bottom from "../public/images/bottom.png";
 import Image from "next/image";
 import Barcode from "react-barcode";
+import logo from "../public/images/form-logo.jpg";
+
 const PrintComponentPages = ({ setFormOne, data, session }) => {
-  const [gender,setGender] = useState(data.gender)
+  const [gender, setGender] = useState(data.gender)
   const componentRef = useRef();
   const getAge = () => {
     const birthDate = new Date(data?.birthDate)
@@ -23,8 +25,10 @@ const PrintComponentPages = ({ setFormOne, data, session }) => {
     return age;
   }
   const formatDate = (date) => {
-    const options = { day: '2-digit', month: 'short', year: 'numeric' };
-    return date.toLocaleDateString('en-GB', options).replace(/\//g, '-');
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
   const getCurrentDate = () => {
     const today = new Date();
@@ -63,16 +67,28 @@ const PrintComponentPages = ({ setFormOne, data, session }) => {
         {/* page 1 */}
         <div className="flex  flex-col py-10 px-4 border-4 h-[900px] border-[#348eca]">
           {" "}
-          <div className="flex w-full justify-between items-center flex">
-            <div className="flex">
-              <div className="arabic text-sm text-[#348eca] mt-[26px]">
-                {data?.batchNumber}
+          <div className="flex w-full justify-between items-center">
+            <div className="flex-1 text-right">
+              <div className="justify-right arabic text-sm flex text-[#348eca]">
+                <Image
+                  alt="mo-data"
+                  src={logo}
+                  height={100}
+                  width={100}
+                  className="flex max-h-[50px] rounded-md mt-1"
+                />
               </div>
-              <div className="text-[#348eca]">
+
+            </div>
+            <div className="flex-1 text-center">
+              <div className="arabic text-sm text-[#348eca] mt-[26px]">
+                Batch Number: {data?.batchNumber}
+              </div>
+              <div className="text-[#348eca] flex justify-center">
                 <Barcode value={data?.claimNumber} className="h-[80px] w-[200px] barcode" />
               </div>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 text-left">
               <div className="arabic text-sm flex justify-end text-[#348eca]">
                 نموذج طلب دخول للعلاج
               </div>
@@ -90,12 +106,12 @@ const PrintComponentPages = ({ setFormOne, data, session }) => {
               <input
                 className="border px-1 text-[#348eca] border-[#348eca] placeholder:text-[#348eca] text-[10px] py-1 w-full  arabic"
                 placeholder="اسم المصحة"
-                value={session?.user.name}
+                value={"اسم المصحة: " + session?.user.name}
               />
               <input
                 className="border px-1 text-[#348eca] border-[#348eca] placeholder:text-[#348eca] w-full text-[10px] py-1 arabic"
                 placeholder="التاريخ"
-                value={getCurrentDate()}
+                value={"التاريخ: "+ getCurrentDate()}
               />
               <div className="flex">
                 <input
@@ -109,8 +125,8 @@ const PrintComponentPages = ({ setFormOne, data, session }) => {
                     id="vehicle3"
                     name="vehicle3"
                     value="Male"
-                    checked={gender== "Male"}
-                    onClick={()=>setGender("Male")}
+                    checked={gender == "Male"}
+                    onClick={() => setGender("Male")}
                     className="ml-5 w-1/2 h-3"
                   />{" "}
                   أنتي
@@ -120,7 +136,7 @@ const PrintComponentPages = ({ setFormOne, data, session }) => {
                     name="vehicle3"
                     value="Female"
                     checked={gender == "Female"}
-                    onClick={()=>setGender("Female")}
+                    onClick={() => setGender("Female")}
                     className="ml-5 w-1/2 h-3"
                   />{" "}
                 </div>
@@ -134,17 +150,17 @@ const PrintComponentPages = ({ setFormOne, data, session }) => {
               <input
                 className="border text-[#348eca] px-1 border-[#348eca] placeholder:text-[#348eca] w-full text-[10px] py-1 arabic"
                 placeholder="اسم المؤمن"
-                value={data?.assuredName}
+                value={"اسم المؤمن: "+ data?.assuredName}
               />
               <input
                 className="border px-1 text-[#348eca] border-[#348eca] placeholder:text-[#348eca] w-full text-[10px] py-1 arabic"
                 placeholder="رقم بطاقة التأمين"
-                value={data?.assuredID}
+                value={"رقم بطاقة التأمين: "+ data?.assuredID}
               />
               <input
                 className="border px-1 text-[#348eca] border-[#348eca] placeholder:text-[#348eca] w-full text-[10px] py-1 arabic"
                 placeholder="العمر"
-                value={getAge()}
+                value={"العمر: "+ getAge()}
               />
               <input
                 className="border px-1 text-[#348eca] border-[#348eca] placeholder:text-[#348eca] w-full text-[10px] py-1 arabic"

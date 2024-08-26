@@ -197,14 +197,14 @@ const Sidebar = ({ session }) => {
                 src={slogo}
                 width={38}
                 height={39}
-                className="flex justify-center m-auto "
+                className="flex justify-center m-auto " alt="mo-data" 
               />
             ) : (
               <Image
                 src={logo}
                 width={197}
                 height={39}
-                className="flex pl-4 "
+                className="flex pl-4 " alt="mo-data" 
               />
             )}
           </div>
