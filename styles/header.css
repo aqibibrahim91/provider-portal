@@ -1,0 +1,5 @@
+.custom-input {
+    @apply max-h-11 border-solid border-2 px-4 py-4 rounded-md
+  }
+  
+  

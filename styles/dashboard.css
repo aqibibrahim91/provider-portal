@@ -1,0 +1,12 @@
+.approved{
+    @apply bg-custom-bg-approved text-green
+}
+.under-review{
+    @apply bg-custom-bg-under-review text-orange
+}
+.rejected{
+    @apply bg-custom-bg-rejected text-red
+}
+.ant-table-row{
+    cursor: pointer !important;
+}
