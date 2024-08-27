@@ -17,7 +17,7 @@ import { Search } from "lucide-react";
 import { formatDate } from "@/utils/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { editCaseDeactive, setClaimNumber } from "./EditInvoiceSlice";
-import Modal from "./Modal"; // Import the Modal component
+import DeleteModal from "./Modal"; // Import the Modal component
 import toast from "react-hot-toast";
 import PrintComponentPages from "./PrintForm2";
 import { apiClient } from "@/app/api";
@@ -27,6 +27,7 @@ import {
   addClaimNumber,
   editCaseActive,
 } from "../components/EditInvoiceSlice";
+import Modal from "react-responsive-modal";
 
 function InsertClaim({
   session,
@@ -64,6 +65,7 @@ function InsertClaim({
   const id = session?.user?.email;
   const token = session?.user?.image;
   const [claimNumberInput, setClaimNumberInput] = useState("");
+  const [submitConfirmation, setSubmitConfirmation] = useState(false);
   const [formState, setFormState] = useState({
     invoiceNumber: "",
     treatmentDate: null,
@@ -612,9 +614,7 @@ function InsertClaim({
     fetchMedicalServices();
 
   };
-  const isActive = () => {
-    return (data.employmentStatus == "Active")
-  }
+
   const columns = [
     {
       title: "Invoice#",
@@ -667,42 +667,52 @@ function InsertClaim({
       dataIndex: "",
       key: "keyRef",
     },
-    data?.isSubmitted === null && isActive()
+    data?.isSubmitted === null
       ? {
         title: "Actions", // Added title for the actions column
         key: "action",
-        render: (_, record) => {
-          isActive() && (
-            <Space size="middle">
-              <a>
-                {selectedRow === record.keyRef && edit ? (
-                  <X
-                    className="text-[#2B3F6C]"
-                    onClick={() => handleEditClickEnd(record)}
-                  />
-                ) : (
-                  <SquarePen
-                    className="text-[#2B3F6C]"
-                    onClick={() => handleEditClick(record)}
-                  />
-                )}
-              </a>{" "}
-              <a>
-                <Trash2
-                  className="text-red
-                  "
-                  onClick={() => handleDeleteClick(record)}
+        render: (_, record) =>
+        (
+          <Space size="middle">
+            <a>
+              {selectedRow === record.keyRef && edit ? (
+                <X
+                  className="text-[#2B3F6C]"
+                  onClick={() => handleEditClickEnd(record)}
                 />
-              </a>{" "}
-            </Space>
-          )
-        }
+              ) : (
+                <SquarePen
+                  className="text-[#2B3F6C]"
+                  onClick={() => handleEditClick(record)}
+                />
+              )}
+            </a>{" "}
+            <a>
+              <Trash2
+                className="text-red
+                  "
+                onClick={() => handleDeleteClick(record)}
+              />
+            </a>{" "}
+          </Space>
+        )
+
 
         ,
       }
       : {},
   ];
   const submitClaim = async () => {
+    setSubmitConfirmation(true)
+  };
+  const onYesSubmitConfirmation = () => {
+    makeSubmitAPICall()
+    closeSubmitConfirmation()
+  }
+  const closeSubmitConfirmation = () => {
+    setSubmitConfirmation(false)
+  }
+  const makeSubmitAPICall = async () => {
     const token = session?.user?.image;
 
     try {
@@ -734,7 +744,7 @@ function InsertClaim({
       console.error("apiClient error:", error);
     }
     setClaimLoad(true);
-  };
+  }
   const handleDataChange = (pagination) => {
     setPageIndex(pagination.current)
   }
@@ -802,7 +812,6 @@ function InsertClaim({
                       type="primary"
                       htmlType="submit"
                       onClick={() => submitClaim()}
-                      disabled={!isActive()}
                       className="bg-[#113493] w-[160px] border-none ml-2.5 text-white h-[48px] font-inter font-semibold text-base"
                     >
                       Submit Claim
@@ -840,7 +849,7 @@ function InsertClaim({
                           </div>
                         </div>
                         <div className="flex gap-2.5 ">
-                          <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] w-[65px] h-[28px] rounded-md align-middle items-center">
+                          <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] max-w-[65px] h-[28px] rounded-md align-middle items-center">
                             <p className="text-sm font-medium text-white">
                               {" "}
                               {data?.gender}
@@ -1094,7 +1103,6 @@ function InsertClaim({
                               <Button
                                 type="primary"
                                 htmlType="submit"
-                                disabled={!isActive()}
                                 className="bg-[#113493] border-none w-full  text-white h-[48px] font-inter font-semibold text-base"
                               >
                                 <ReceiptText />
@@ -1118,7 +1126,7 @@ function InsertClaim({
                       total: totalCount, // total count returned from backend
                     }}
                   />
-                  <Modal
+                  <DeleteModal
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     onConfirm={handleConfirmDelete}
@@ -1135,6 +1143,20 @@ function InsertClaim({
           <PrintParentComponent setPrintClaim={setPrintClaim} data={data} session={session} />
         </div>
       )}
+
+      <Modal
+        open={submitConfirmation}
+        center
+        onClose={() => closeSubmitConfirmation()}
+      >
+        <div className="p-5 text-lg font-semibold">
+          Are you sure you want to submit claim?
+        </div>
+        <div className="justify-center flex gap-3">
+          <Button type="primary" className="bg-green p-5 text-md text-white border-none font-inter font-semibold text-base hover:bg-green" onClick={() => onYesSubmitConfirmation()}>Yes</Button>
+          <Button type="primary" className="bg-red p-5 text-md text-white border-none font-inter font-semibold text-base hover:bg-red" onClick={() => closeSubmitConfirmation()}>No</Button>
+        </div>
+      </Modal>
     </>
   );
 }

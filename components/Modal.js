@@ -1,6 +1,6 @@
 import React from "react";
 
-const Modal = ({ isOpen, onClose, onConfirm, record, session }) => {
+const DeleteModal = ({ isOpen, onClose, onConfirm, record, session }) => {
   if (!isOpen) return null;
 
   return (
@@ -27,4 +27,4 @@ const Modal = ({ isOpen, onClose, onConfirm, record, session }) => {
   );
 };
 
-export default Modal;
+export default DeleteModal;

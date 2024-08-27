@@ -186,9 +186,8 @@ const Sidebar = ({ session }) => {
   return (
     <div className="flex w-full absolute">
       <div
-        className={`z-10 h-screen bg-white flex flex-col font-inter ${
-          collapsed ? "w-20" : "w-[280px]"
-        }`}
+        className={`z-10 h-screen bg-white flex flex-col font-inter ${collapsed ? "w-20" : "w-[280px]"
+          }`}
       >
         <div className={` ${collapsed ? "" : "w-[280px]"}`}>
           <div className="flex py-7">
@@ -197,14 +196,14 @@ const Sidebar = ({ session }) => {
                 src={slogo}
                 width={38}
                 height={39}
-                className="flex justify-center m-auto " alt="mo-data" 
+                className="flex justify-center m-auto " alt="mo-data"
               />
             ) : (
               <Image
                 src={logo}
                 width={197}
                 height={39}
-                className="flex pl-4 " alt="mo-data" 
+                className="flex pl-4 " alt="mo-data"
               />
             )}
           </div>
@@ -216,15 +215,13 @@ const Sidebar = ({ session }) => {
                 <div
                   key={item.key}
                   onClick={() => handleClick(item.key)}
-                  className={`flex items-center text-base  gap-3  cursor-pointer  ${
-                    collapsed
+                  className={`flex items-center text-base  gap-3  cursor-pointer  ${collapsed
                       ? "w-20  justify-center items-center align-middle flex"
                       : "w-[280px] pl-[40px]"
-                  } ${
-                    selectedKey === item.key
+                    } ${selectedKey === item.key
                       ? "bg-[#113493] text-white"
                       : "bg-white text-black"
-                  }`}
+                    }`}
                   style={{ height: "80px", opacity: "0.8" }}
                 >
                   {item.icon}
@@ -251,23 +248,6 @@ const Sidebar = ({ session }) => {
                 <Menu className="h-8 w-7" />
               </Button>
             )}
-          </div>
-        </div>
-        <div
-          className={`mt-auto p-4 flex gap-[8px]  ${
-            collapsed ? "" : "pl-[40px]"
-          } `}
-        >
-          <div className="w-12 h-12  bg-[#113493] text-white flex items-center justify-center rounded-full">
-            <span className="flex">AK</span>
-          </div>
-          <div
-            className={`text-[16px] text-[#637381] font-inter font-medium ${
-              collapsed ? "hidden" : "block"
-            }`}
-          >
-            Al Khalid Medical
-            <p className="text-[14px] text-[#113493]"> View Details</p>
           </div>
         </div>
       </div>

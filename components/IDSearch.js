@@ -119,7 +119,7 @@ function IDSearch({
     setAssuredID(value);
   };
   const isActive = () => {
-    return (data.employmentStatus == "Active" && data.policyStatus == "Actove")
+    return (data.employmentStatus == "Active" && data.policyStatus == "Active")
   }
 
   return (

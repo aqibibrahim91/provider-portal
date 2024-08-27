@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Space } from "antd";
 import DataTable from "./DataTable";
-import { Save, ReceiptText, Trash2, SquarePen } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import noData from "../public/images/Missing.png";
 import Image from "next/image";
 import { apiClient } from "@/app/api";
 import Loader from "./loader";
-function BatchData({ batch, setBatch, batchNumber, session }) {
+import Dashboard from "./Dashboard";
+
+function BatchData({ batch, setBatch, batchNumber, session,setDetailsBit, detailsBit }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState();
   const [pageSize, setPageSize] = useState(10);
   const [pageIndex, setPageIndex] = useState(1);
   const [totalCount, setTotalCount] = useState(0)
+  const [back,setBack] = useState(false);
 
   const columns = [
     {
@@ -100,84 +103,106 @@ function BatchData({ batch, setBatch, batchNumber, session }) {
   const handleDataChange = (pagination) => {
     setPageIndex(pagination.current)
   }
+  
   return (
-    <div className="ml-1 w-full lg:pr-[60px] flex flex-col">
-      <Loader loading={loading} />
-      {data ? (
-        <>
-          <div className="flex items-center justify-between">
-            <div className="font-medium text-2xl">Batch Data</div>
-            <div className="flex items-center">
-              <Button
-                type="primary"
-                htmlType="submit"
-                className="bg-[#113493] w-[212px] border-none ml-2.5 text-white h-[48px] font-inter !font-medium text-base"
-              >
-                Print Report
-              </Button>
-            </div>
-          </div>
-          <div className="flex gap-2.5 mt-10 flex-wrap w-full">
-            <div className="flex flex-col bg-white rounded p-5 flex-grow  ">
-              <div className="text-base text-[#637381] s">Batch No#</div>
-              <div className="font-bold text-[28px] leading-9 text-[#637381]">
-                {batchNumber?.batchNumber}
+    back ? (
+      <Dashboard
+        setDetailsBit={setDetailsBit}
+        detailsBit={detailsBit}
+        session={session}
+      />
+    ) : (
+      < div className="ml-1 w-full lg:pr-[60px] flex flex-col" >
+        <Loader loading={loading} />
+        {
+          data ? (
+            <>
+              <div>
+                <Button
+                  className=" w-[212px] border-none h-[35px] font-inter text-base"
+                  onClick={()=>{setBack(true)}}
+                >
+                  <ArrowLeft />
+                  Back to Dashboard
+                </Button>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="font-medium text-2xl">Batch Data</div>
+                <div className="flex items-center">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    className="bg-[#113493] w-[212px] border-none ml-2.5 text-white h-[48px] font-inter !font-medium text-base"
+                  >
+                    Print Report
+                  </Button>
+                </div>
+              </div>
+              <div className="flex gap-2.5 mt-10 flex-wrap w-full">
+                <div className="flex flex-col bg-white rounded p-5 flex-grow  ">
+                  <div className="text-base text-[#637381] s">Batch No#</div>
+                  <div className="font-bold text-[28px] leading-9 text-[#637381]">
+                    {batchNumber?.batchNumber}
+                  </div>
+                </div>
+                <div className="flex flex-col bg-white rounded p-5 flex-grow ">
+                  <div className="text-base text-[#637381]">No. of Claims</div>
+                  <div className="font-bold text-[28px] leading-9 text-[#637381]">
+                    {batchNumber?.claims}
+                  </div>
+                </div>
+                <div className="flex flex-col bg-white rounded p-5 flex-grow ">
+                  <div className="text-base text-[#637381]">Sum of Claims</div>
+                  <div className="font-bold text-[28px] leading-9 text-[#637381]">
+                    {batchNumber?.sumOfClaims}
+                  </div>
+                </div>
+                <div className="flex flex-col bg-white rounded p-5 flex-grow ">
+                  <div className="text-base text-[#637381]">Status</div>
+                  <div className="font-bold text-[28px] leading-9 text-[#637381]">
+                    {batchNumber?.status}
+                  </div>
+                </div>
+              </div>
+              <div className="flex text-[25px] py-[22px] leading-6 text-black font-medium">
+                Claims Data
+              </div>
+              <div className="flex bg-white rounded-[20px] w-full flex-col">
+                <Table
+                  columns={columns}
+                  dataSource={data}
+                  className={`!font-inter`}
+                  onChange={handleDataChange}
+                  pagination={{
+                    current: pageIndex,
+                    total: totalCount, // total count returned from backend
+                  }}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center m-auto flex-col justify-center mt-44 w-full">
+              <div className="flex font-medium  flex-col text-xl font-inter justify-center ">
+                No data available
+              </div>{" "}
+              <Image src={noData} className="w-56 h-56 mt-3 flex justify-center" alt="no-data" />
+              <div className="flex items-center">
+                <Button
+                  type="primary"
+                  onClick={() => setBatch(false)}
+                  htmlType="submit"
+                  className="bg-[#113493] w-[212px] mt-3 border-none ml-2.5 text-white h-[48px] font-inter !font-medium text-base"
+                >
+                  Back to Dashboard
+                </Button>
               </div>
             </div>
-            <div className="flex flex-col bg-white rounded p-5 flex-grow ">
-              <div className="text-base text-[#637381]">No. of Claims</div>
-              <div className="font-bold text-[28px] leading-9 text-[#637381]">
-                {batchNumber?.claims}
-              </div>
-            </div>
-            <div className="flex flex-col bg-white rounded p-5 flex-grow ">
-              <div className="text-base text-[#637381]">Sum of Claims</div>
-              <div className="font-bold text-[28px] leading-9 text-[#637381]">
-                {batchNumber?.sumOfClaims}
-              </div>
-            </div>
-            <div className="flex flex-col bg-white rounded p-5 flex-grow ">
-              <div className="text-base text-[#637381]">Status</div>
-              <div className="font-bold text-[28px] leading-9 text-[#637381]">
-                {batchNumber?.status}
-              </div>
-            </div>
-          </div>
-          <div className="flex text-[25px] py-[22px] leading-6 text-black font-medium">
-            Claims Data
-          </div>
-          <div className="flex bg-white rounded-[20px] w-full flex-col">
-            <Table
-              columns={columns}
-              dataSource={data}
-              className={`!font-inter`}
-              onChange={handleDataChange}
-              pagination={{
-                current: pageIndex,
-                total: totalCount, // total count returned from backend
-              }}
-            />
-          </div>
-        </>
-      ) : (
-        <div className="flex items-center m-auto flex-col justify-center mt-44 w-full">
-          <div className="flex font-medium  flex-col text-xl font-inter justify-center ">
-            No data available
-          </div>{" "}
-          <Image src={noData} className="w-56 h-56 mt-3 flex justify-center" alt="no-data" />
-          <div className="flex items-center">
-            <Button
-              type="primary"
-              onClick={() => setBatch(false)}
-              htmlType="submit"
-              className="bg-[#113493] w-[212px] mt-3 border-none ml-2.5 text-white h-[48px] font-inter !font-medium text-base"
-            >
-              Back to Dashboard
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
+          )
+        }
+      </div >
+    )
+
+
   );
 }
 

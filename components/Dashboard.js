@@ -58,7 +58,7 @@ export default function Dashboard({ setDetailsBit, detailsBit, session }) {
 
         const result = JSON.parse(text);
         const transformedData = transformData(result?.successResponse);
-        
+
 
         setData(transformedData);
         setPagination({
@@ -246,6 +246,8 @@ export default function Dashboard({ setDetailsBit, detailsBit, session }) {
           batchNumber={selectedBatchNumber}
           batch={batch}
           session={session}
+          setDetailsBit={setDetailsBit}
+          detailsBit={detailsBit}
         />
       ) : (
 
