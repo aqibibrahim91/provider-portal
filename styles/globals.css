@@ -94,3 +94,6 @@
   fill: #348eca;
   font-size: 27px !important;
 }
+.border-red .ant-picker{
+  border: 2px solid red;
+}

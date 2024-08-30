@@ -167,8 +167,9 @@ const Sidebar = ({ session }) => {
     {
       label: "Pre Approval Page",
       icon: <SwatchBook />,
-      component: <PreApproval />,
+      component: <PreApproval session={session} />,
       key: "7",
+      
     },
   ];
 
