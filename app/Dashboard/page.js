@@ -1,20 +1,25 @@
 "use client";
 import StatusLabel from "@/components/status-label";
-import { Table, Progress, Button, Spin } from "antd";
+import { Table, Progress, Button } from "antd";
 import { useEffect, useState } from "react";
-import BatchData from "./BatchData";
+import BatchData from "@/components/BatchData";
 import { apiClient } from "@/app/api";
-import Loader from "./loader";
-import HealthCareDetails from "./HealthCareDetails";// import your HealthcareDetails component
+import Loader from "@/components/loader";
+import HealthCareDetails from "@/components/HealthCareDetails"; // import your HealthcareDetails component
+import { getServerSession } from "next-auth/next";
+// Ensure this import is correct
+import { useSession } from "next-auth/react";
 
-export default function Dashboard({ setDetailsBit, detailsBit, session }) {
+export default function Dashboard() {
+  const { data: session } = useSession();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(session.user?.image);
+  const [token, setToken] = useState(null);
   const [selectedBatchNumber, setSelectedBatchNumber] = useState(null);
   const [batch, setBatch] = useState(false);
   const [providerDetails, setProviderDetails] = useState("");
-  const [showDetails, setShowDetails] = useState(false); // New state to toggle HealthcareDetails visibility
+  const [showDetails, setShowDetails] = useState(false);
+  const [showBatch, setShowBatch] = useState(false); // New state to toggle HealthcareDetails visibility
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -22,15 +27,15 @@ export default function Dashboard({ setDetailsBit, detailsBit, session }) {
   });
 
   useEffect(() => {
-    fetchData(pagination.current, pagination.pageSize);
-    fetchProviderData();
-  }, [session, token]);
-
-  const fetchData = async (page, pageSize) => {
     if (session) {
-      const id = session?.user?.email;
-      const token = session?.user?.image;
+      setToken(session.user?.image);
+      fetchData(pagination.current, pagination.pageSize, session.user?.email, session.user?.image);
+      fetchProviderData(session.user?.email, session.user?.image);
+    }
+  }, [pagination.current, pagination.pageSize, session]);
 
+  const fetchData = async (page, pageSize, id, token) => {
+    if (id && token) {
       console.log("Session found. User ID:", id);
       try {
         const response = await apiClient(
@@ -83,11 +88,8 @@ export default function Dashboard({ setDetailsBit, detailsBit, session }) {
     }
   };
 
-  const fetchProviderData = async () => {
-    if (session) {
-      const id = session?.user?.email;
-      const token = session?.user?.image;
-
+  const fetchProviderData = async (id, token) => {
+    if (id && token) {
       console.log("Session found. User ID:", id);
       try {
         const response = await apiClient(
@@ -226,38 +228,40 @@ export default function Dashboard({ setDetailsBit, detailsBit, session }) {
   };
 
   const handleTableChange = (pagination) => {
-    fetchData(pagination.current, pagination.pageSize);
+    fetchData(pagination.current, pagination.pageSize, token);
   };
 
   const handleClick = () => {
     setShowDetails(!showDetails); // Toggle the showDetails state
-    // setDetailsBit(!detailsBit)
   };
 
   const handleRowClick = (record) => {
-    setBatch(true);
     setSelectedBatchNumber(record);
+    setShowBatch(true);
   };
+
   const handleCloseDetails = () => {
     setShowDetails(false);
+  };
+
+  const handleCloseBatch = () => {
+    console.log("Clicked");
+    setShowBatch(false);
   };
 
   return (
     <>
       <Loader loading={loading} />
-      {batch ? (
+      {showBatch ? (
         <BatchData
-          setBatch={setBatch}
           batchNumber={selectedBatchNumber}
-          batch={batch}
           session={session}
-          setDetailsBit={setDetailsBit}
-          detailsBit={detailsBit}
+          onCloseBatch={handleCloseBatch}
         />
-      ) : showDetails ? ( // Conditionally render HealthcareDetails or table and button div
+      ) : showDetails ? (
         <HealthCareDetails
-        onClose={handleCloseDetails} 
-        session={session}
+          onClose={handleCloseDetails} 
+          session={session}
         />
       ) : (
         <div className="flex w-full flex-col lg:pr-[60px]">
@@ -276,7 +280,7 @@ export default function Dashboard({ setDetailsBit, detailsBit, session }) {
                 type="primary"
                 htmlType="submit"
                 className="bg-[#113493] border-none ml-2.5 text-white h-[30px] w-[111px] font-inter"
-                onClick={handleClick} // Use handleClick function
+                onClick={handleClick}
               >
                 View Details
               </Button>

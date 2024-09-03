@@ -4,11 +4,12 @@ import avatar from "../public/images/avatar.jpg";
 import Image from "next/image";
 import { Mail, MapPin, Globe, Phone, Banknote, XIcon } from "lucide-react";
 import { apiClient } from "@/app/api";
-function HealthCareDetails({ detailsBit, setDetailsBit, session }) {
+// { detailsBit, setDetailsBit, session }
+function HealthCareDetails({ onClose, session }) {
   const [data, setData] = useState("");
-  const handleClick = () => {
-    setDetailsBit(!detailsBit);
-  };
+  // const handleClick = () => {
+  //   setDetailsBit(!detailsBit);
+  // };
   useEffect(() => {
     const fetchData = async () => {
       if (session) {
@@ -93,7 +94,9 @@ function HealthCareDetails({ detailsBit, setDetailsBit, session }) {
           </div>
           <div
             className="hover:text-red hover:cursor-pointer"
-            onClick={handleClick}
+            
+            onClick={onClose}
+            // onClick={handleClick}
           >
             <XIcon />
           </div>

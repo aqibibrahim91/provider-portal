@@ -54,9 +54,15 @@ export default async function RootLayout({ children }) {
             {session?.user?.name ? (
               <div className="flex h-screen font-inter">
                 <Sidebar session={session} />
-                <HeaderBar />
-                <main>{children}</main>
-              </div>
+                
+
+             
+             
+                <div className="flex flex-col w-full">
+              <HeaderBar />
+              <div className="flex-grow px-3 overflow-auto">{children}</div>
+            </div>
+            </div>
             ) : (
               <div className="overflow-auto w-full h-full flex justify-center items-center">
                 <Login />
