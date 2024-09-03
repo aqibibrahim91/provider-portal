@@ -17,7 +17,7 @@ const PreApproval = (props) => {
   const [medicalService, setMedicalService] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
   const [doctor, setDoctor] = useState("");
-  const [doctorContactNumber, setDoctorContactNumber] = useState("")
+  const [doctorContactNo, setDoctorContactNo] = useState("")
   const [caseDate, setCaseDate] = useState("")
   const [admissionDate, setAdmissionDate] = useState("")
   const [dischargeDate, setDischargeDate] = useState("")
@@ -29,19 +29,18 @@ const PreApproval = (props) => {
   const [admissionError, setAdmissionError] = useState(false)
   const [dischargeError, setDischargeError] = useState(false)
   const [caseDateError, setCaseDateError] = useState(false)
-  const [caseNumber,setCaseNumber] = useState("")
+  const [caseNumber, setCaseNumber] = useState("")
 
 
   useEffect(() => {
     getPreApprovalData()
   }, [])
 
-  const getAssuredPerson = async (name = assuredSearch) => {
-    console.log("name: ", assuredSearch)
+  const getAssuredPerson = async (cardNumber = assuredSearch) => {
     setLoad(true);
     const token = props.session?.user?.image;
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/AssuredPerson/GetAssuredPersonByName?name=${name}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/AssuredPerson/GetAssuredPerson?cardNumber=${cardNumber}`,
       {
         method: "GET",
         headers: {
@@ -126,7 +125,6 @@ const PreApproval = (props) => {
         setAdmissionError(true)
       }
       if (caseDate == null || caseDate == "") {
-        console.log('here')
         setCaseDateError(true)
       }
       if (dischargeDate == null || dischargeDate == "") {
@@ -145,7 +143,7 @@ const PreApproval = (props) => {
         providerID: id,
         assuredContactNo: phoneNumber,
         doctor: doctor,
-        doctorContactNumber: doctorContactNumber,
+        doctorContactNo: doctorContactNo,
         caseDate: formatDate(caseDate),
         admissionDate: formatDate(admissionDate),
         dischargeDate: formatDate(dischargeDate),
@@ -211,17 +209,17 @@ const PreApproval = (props) => {
         <Space size="middle">
           <a>
             <SquarePen onClick={() => handleEdit(record)} className="text-[#2B3F6C]" />
-          </a>{" "}
+          </a>
         </Space>
       ),
     },
   ];
 
+
   const handleEdit = async (record) => {
-    console.log("record: ", record)
     setPhoneNumber(record.assuredContactNo)
     setDoctor(record.doctorName)
-    setDoctorContactNumber(record.doctorContactNumber)
+    setDoctorContactNo(record.doctorContactNo)
     setCaseDate(record.caseDate ? moment(record.caseDate, 'DD/MM/YYYY') : "")
     setAdmissionDate(record.admissionDate ? moment(record.admissionDate, 'DD/MM/YYYY') : "")
     setDischargeDate(record.dischargeDate ? moment(record.dischargeDate, 'DD/MM/YYYY') : "")
@@ -232,12 +230,12 @@ const PreApproval = (props) => {
     setAssuredSearch(record.name)
     setCaseNumber(record.caseNo)
     setNewCase(true)
-    await getAssuredPerson(record.name)
+    await getAssuredPerson(record.assuredID)
   }
   const clearFormData = () => {
     setPhoneNumber("")
     setDoctor("")
-    setDoctorContactNumber("")
+    setDoctorContactNo("")
     setCaseDate("")
     setAdmissionDate("")
     setDischargeDate("")
@@ -249,10 +247,10 @@ const PreApproval = (props) => {
   }
 
   const toggleRowExpansion = (key) => {
-    setExpandedRowKeys(
-      expandedRowKeys.includes(key)
-        ? expandedRowKeys.filter((k) => k !== key)
-        : [...expandedRowKeys, key]
+    setExpandedRowKeys((prevExpandedKeys) =>
+      prevExpandedKeys.includes(key)
+        ? prevExpandedKeys.filter((k) => k !== key) // Collapse the row if already expanded
+        : [...prevExpandedKeys, key] // Expand the row if not already expanded
     );
   };
 
@@ -262,22 +260,18 @@ const PreApproval = (props) => {
       className="flex justify-evenly"
     >
       <div className="flex flex-col gap-1">
-        {" "}
         <p className="font-medium text-[14px] leading-6">Admission Date</p>
         <p className="text-[#637381] text-[14px]">{record.admissionDate}</p>
       </div>
       <div className="flex flex-col gap-1">
-        {" "}
         <p className="font-medium text-[14px] leading-6">Discharge Date</p>
         <p className="text-[#637381] text-[14px]">{record.dischargeDate}</p>
-      </div>{" "}
+      </div>
       <div className="flex flex-col gap-1">
-        {" "}
         <p className="font-medium text-[14px] leading-6">Case Date</p>
         <p className="text-[#637381] text-[14px]">{record.caseDate}</p>
-      </div>{" "}
+      </div>
       <div className="flex flex-col gap-1">
-        {" "}
         <p className="font-medium text-[14px] leading-6">Treatment</p>
         <p className="text-[#637381] text-[14px]">{record.treatment}</p>
       </div>
@@ -290,292 +284,305 @@ const PreApproval = (props) => {
       <Loader loading={load} />
       {newCase ? (
         <div className="ml-1 w-full pr-[60px] flex flex-col">
-          <div className="flex  items-center justify-between">
-            <div className="font-medium text-2xl">Search Assured Person</div>
-            <div className="flex items-center">
+          <div className="font-medium text-2xl">Search Assured ID</div>
+          <div className=" w-full ">
+            <div className="">
               <Input
                 type="text"
+                required
+                placeholder="Search Assured ID"
                 onChange={(e) => setAssuredSearch(e.target.value)}
                 value={assuredSearch}
-                placeholder="Enter Assured Person Name"
-                className="h-12 w-[270px] ml-[14px] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
+                className="h-12 w-[270px] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
               />
               <Button
                 type="primary"
                 htmlType="submit"
+                className="bg-[#113493] border-none ml-2.5 text-white h-[46px] w-[46px] font-inter"
                 onClick={() => getAssuredPerson()}
-                className="bg-[#113493] w-[46px] border-none ml-2.5 text-white h-[48px] font-inter !font-medium text-base"
+                loading={load}
               >
-                <Search />
+                <Search className="h-5 w-5" />
               </Button>
             </div>
-          </div>{" "}
-          <div className="flex  gap-[22px] mt-[22px]">
-            <div className="w-[70%] h-[827px] bg-white rounded-lg border border-[#E7E7E7]">
-              <div className="py-3 border-b border-[#E7E7E7]">
-                <p className="ml-5 font-semibold text-base text-[#212B36]">
-                  Personal Information
-                </p>
-              </div>
-              <div className="mt-8 w-full flex px-5 gap-[11px]">
-                <div className="w-1/2">
-                  {" "}
-                  <div className="mb-2 w-full !font-medium">
-                    Type of Medical Service
-                  </div>{" "}
-                  <Input
-                    style={{ fontFamily: "inter" }}
-                    onChange={(e) => setMedicalService(e.target.value)}
-                    value={medicalService}
-                    type="text"
-                    placeholder="Type of Medical Service"
-                    className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
-                  />
-                </div>{" "}
-                <div className="w-1/2">
-                  <div className="mb-2 w-full !font-medium">Phone Number</div>
-                  <Input
-                    style={{ fontFamily: "inter" }}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    value={phoneNumber}
-                    type="text"
-                    placeholder="Phone Number"
-                    className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
-                  />
+          </div>
+          {assuredData && (
+            <div className="flex  gap-[22px] mt-[22px]">
+              <div className="w-[70%] h-[827px] bg-white rounded-lg border border-[#E7E7E7]">
+                <div className="py-3 border-b border-[#E7E7E7]">
+                  <p className="ml-5 font-semibold text-base text-[#212B36]">
+                    Personal Information
+                  </p>
                 </div>
-              </div>{" "}
-              <div className="mt-8 w-full flex px-5 gap-[11px]">
-                <div className="w-1/2">
-                  <div className="mb-2 w-full !font-medium">
-                    Doctor Name
+                <div className="mt-8 w-full flex px-5 gap-[11px]">
+                  <div className="w-1/2">
+                    {" "}
+                    <div className="mb-2 w-full !font-medium">
+                      Type of Medical Service
+                    </div>{" "}
+                    <Input
+                      style={{ fontFamily: "inter" }}
+                      onChange={(e) => setMedicalService(e.target.value)}
+                      value={medicalService}
+                      type="text"
+                      placeholder="Type of Medical Service"
+                      className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
+                    />
                   </div>{" "}
-                  <Input
-                    type="invoice_number"
-                    onChange={(e) => setDoctor(e.target.value)}
-                    value={doctor}
-                    placeholder="Enter Doctor Name"
-                    className="h-12 px-3  placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
-                  />
-                </div>
-                <div className="w-1/2">
-                  {" "}
-                  <div className="mb-2 w-full !font-medium">
-                    Doctor Contact Number
-                  </div>{" "}
-                  <Input
-                    type="invoice_number"
-                    onChange={(e) => setDoctorContactNumber(e.target.value)}
-                    value={doctorContactNumber}
-                    placeholder="Enter Doctor Contact"
-                    className="h-12 px-3  placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
-                  />
+                  <div className="w-1/2">
+                    <div className="mb-2 w-full !font-medium">Phone Number</div>
+                    <Input
+                      style={{ fontFamily: "inter" }}
+                      onChange={(e) => {
+                        const onlyDigits = e.target.value.replace(/\D/g, ""); // Removes all non-digit characters
+                        setPhoneNumber(onlyDigits);
+                      }}
+                      value={phoneNumber}
+                      pattern="[0-9]*"
+                      type="text"
+                      placeholder="Phone Number"
+                      className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
+                    />
+                  </div>
                 </div>{" "}
+                <div className="mt-8 w-full flex px-5 gap-[11px]">
+                  <div className="w-1/2">
+                    <div className="mb-2 w-full !font-medium">
+                      Doctor Name
+                    </div>{" "}
+                    <Input
+                      type="invoice_number"
+                      onChange={(e) => setDoctor(e.target.value)}
+                      value={doctor}
+                      placeholder="Enter Doctor Name"
+                      className="h-12 px-3  placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
+                    />
+                  </div>
+                  <div className="w-1/2">
+                    {" "}
+                    <div className="mb-2 w-full !font-medium">
+                      Doctor Contact Number
+                    </div>{" "}
+                    <Input
+                      type="invoice_number"
+                      onChange={(e) => {
+                        const onlyDigits = e.target.value.replace(/\D/g, ""); // Removes all non-digit characters
+                        setDoctorContactNo(onlyDigits);
+                      }}
+                      pattern="[0-9]*"
+                      value={doctorContactNo}
+                      placeholder="Enter Doctor Contact"
+                      className="h-12 px-3  placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
+                    />
+                  </div>{" "}
 
-              </div>{" "}
-              <div className="mt-8 w-full flex px-5 gap-[11px]">
-                <div className={`w-1/2 ${admissionError ? "border-red" : ""}`}>
-                  {" "}
-                  <div className="mb-2 w-full !font-medium">
-                    Estimated Date of Admission
-                  </div>{" "}
-                  <DatePicker
-                    onChange={(e) => {
-                      setAdmissionDate(e)
-                      setAdmissionError(false)
-                    }
-                    }
-                    value={admissionDate}
-                    className="h-12 w-full placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
-                  />
                 </div>{" "}
-                <div className={`w-1/2 ${dischargeError ? "border-red" : ""}`}>
-                  <div className="mb-2 w-full !font-medium">
+                <div className="mt-8 w-full flex px-5 gap-[11px]">
+                  <div className={`w-1/2 ${admissionError ? "border-red" : ""}`}>
                     {" "}
-                    Estimated Date of Discharge
-                  </div>
-                  <DatePicker
-                    value={dischargeDate}
-                    onChange={(e) => {
-                      setDischargeDate(e)
-                      setDischargeError(false)
-                    }}
-                    className="h-12 w-full placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
-                  />
-                </div>
-              </div>{" "}
-              <div className="mt-8 w-full flex px-5 gap-[11px]">
-                <div className={`w-1/2 ${caseDateError ? "border-red" : ""}`}>
-                  {" "}
-                  <div className="mb-2 w-full !font-medium">Case Date</div>
-                  <DatePicker
-                    value={caseDate}
-                    onChange={(e) => {
-                      setCaseDate(e)
-                      setCaseDateError(false)
-                    }}
-                    className="h-12 w-full placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
-                  />
-                  {" "}
-                </div>{" "}
-                <div className="w-1/2">
-                  <div className="mb-2 w-full !font-medium"> Diagnosis</div>
-                  <Input
-                    style={{ fontFamily: "inter" }}
-                    value={diagnosis}
-                    onChange={(e) => setDiagnosis(e.target.value)}
-                    type="text"
-                    placeholder="Diagnosis"
-                    className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
-                  />{" "}
-                </div>
-              </div>{" "}
-              <div className="mt-8 w-full flex px-5 gap-[11px]">
-                <div className="w-1/2">
-                  <div className="mb-2 w-full !font-medium">
-                    {" "}
-                    Treatment Notes
-                  </div>
-                  <Input
-                    style={{ fontFamily: "inter" }}
-                    value={treatmentNotes}
-                    onChange={(e) => setTreatmentNotes(e.target.value)}
-                    type="text"
-                    placeholder="Enter  Treatment Notes"
-                    className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
-                  />{" "}
-                </div>
-                <div className="w-1/2">
-                  {" "}
-                  <div className="mb-2 w-full !font-medium">
-                    Estimated Cost
+                    <div className="mb-2 w-full !font-medium">
+                      Estimated Date of Admission
+                    </div>{" "}
+                    <DatePicker
+                      onChange={(e) => {
+                        setAdmissionDate(e)
+                        setAdmissionError(false)
+                      }
+                      }
+                      value={admissionDate}
+                      className="h-12 w-full placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
+                    />
                   </div>{" "}
-                  <Input
-                    style={{ fontFamily: "inter" }}
-                    value={estimatedCost}
-                    onChange={(e) => setEstimatedCost(e.target.value)}
-                    type="number"
-                    placeholder="Enter Estimated Cost"
-                    className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
-                  />{" "}
+                  <div className={`w-1/2 ${dischargeError ? "border-red" : ""}`}>
+                    <div className="mb-2 w-full !font-medium">
+                      {" "}
+                      Estimated Date of Discharge
+                    </div>
+                    <DatePicker
+                      value={dischargeDate}
+                      onChange={(e) => {
+                        setDischargeDate(e)
+                        setDischargeError(false)
+                      }}
+                      className="h-12 w-full placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
+                    />
+                  </div>
                 </div>{" "}
-              </div>{" "}
-              <div className="mt-8 w-full flex px-5 gap-[11px]">
+                <div className="mt-8 w-full flex px-5 gap-[11px]">
+                  <div className={`w-1/2 ${caseDateError ? "border-red" : ""}`}>
+                    {" "}
+                    <div className="mb-2 w-full !font-medium">Case Date</div>
+                    <DatePicker
+                      value={caseDate}
+                      onChange={(e) => {
+                        setCaseDate(e)
+                        setCaseDateError(false)
+                      }}
+                      className="h-12 w-full placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
+                    />
+                    {" "}
+                  </div>{" "}
+                  <div className="w-1/2">
+                    <div className="mb-2 w-full !font-medium"> Diagnosis</div>
+                    <Input
+                      style={{ fontFamily: "inter" }}
+                      value={diagnosis}
+                      onChange={(e) => setDiagnosis(e.target.value)}
+                      type="text"
+                      placeholder="Diagnosis"
+                      className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
+                    />{" "}
+                  </div>
+                </div>{" "}
+                <div className="mt-8 w-full flex px-5 gap-[11px]">
+                  <div className="w-1/2">
+                    <div className="mb-2 w-full !font-medium">
+                      {" "}
+                      Treatment Notes
+                    </div>
+                    <Input
+                      style={{ fontFamily: "inter" }}
+                      value={treatmentNotes}
+                      onChange={(e) => setTreatmentNotes(e.target.value)}
+                      type="text"
+                      placeholder="Enter  Treatment Notes"
+                      className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
+                    />{" "}
+                  </div>
+                  <div className="w-1/2">
+                    {" "}
+                    <div className="mb-2 w-full !font-medium">
+                      Estimated Cost
+                    </div>{" "}
+                    <Input
+                      style={{ fontFamily: "inter" }}
+                      value={estimatedCost}
+                      onChange={(e) => setEstimatedCost(e.target.value)}
+                      type="number"
+                      placeholder="Enter Estimated Cost"
+                      className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
+                    />{" "}
+                  </div>{" "}
+                </div>{" "}
+                <div className="mt-8 w-full flex px-5 gap-[11px]">
 
-                <div className="w-1/2">
-                  <div className="mb-2 w-full !font-medium">
-                    {" "}
-                    Additional Notes
+                  <div className="w-1/2">
+                    <div className="mb-2 w-full !font-medium">
+                      {" "}
+                      Additional Notes
+                    </div>
+                    <Input
+                      style={{ fontFamily: "inter" }}
+                      value={additionalNotes}
+                      onChange={(e) => setAdditionalNotes(e.target.value)}
+                      type="text"
+                      placeholder="Enter Additional Notes"
+                      className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
+                    />{" "}
                   </div>
-                  <Input
-                    style={{ fontFamily: "inter" }}
-                    value={additionalNotes}
-                    onChange={(e) => setAdditionalNotes(e.target.value)}
-                    type="text"
-                    placeholder="Enter Additional Notes"
-                    className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
-                  />{" "}
-                </div>
-                <div className="w-1/2">
-                  <div className="mb-2 w-full !font-medium">Symptoms</div>{" "}
-                  <Input
-                    style={{ fontFamily: "inter" }}
-                    onChange={(e) => setSymptoms(e.target.value)}
-                    value={symptoms}
-                    type="text"
-                    placeholder="Enter Symptoms"
-                    className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
-                  />{" "}
+                  <div className="w-1/2">
+                    <div className="mb-2 w-full !font-medium">Symptoms</div>{" "}
+                    <Input
+                      style={{ fontFamily: "inter" }}
+                      onChange={(e) => setSymptoms(e.target.value)}
+                      value={symptoms}
+                      type="text"
+                      placeholder="Enter Symptoms"
+                      className="h-12  w-full rounded-lg text-sm  bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
+                    />{" "}
+                  </div>
+                </div>{" "}
+                <div className="flex justify-end  px-5 w-full pt-[30px] ">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    onClick={() => setNewCase(false)}
+                    className="bg-[#11349326] w-[134px] border-none ml-2.5 text-white h-[48px] font-inter !font-medium text-base"
+                  >
+                    Cancel
+                  </Button>{" "}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    onClick={() => handleSubmit()}
+                    className="bg-[#113493] w-[134px] border-none ml-2.5 text-white h-[48px] font-inter !font-medium text-base"
+                  >
+                    Save
+                  </Button>
                 </div>
               </div>{" "}
-              <div className="flex justify-end  px-5 w-full pt-[30px] ">
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  onClick={() => setNewCase(false)}
-                  className="bg-[#11349326] w-[134px] border-none ml-2.5 text-white h-[48px] font-inter !font-medium text-base"
-                >
-                  Cancel
-                </Button>{" "}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  onClick={() => handleSubmit()}
-                  className="bg-[#113493] w-[134px] border-none ml-2.5 text-white h-[48px] font-inter !font-medium text-base"
-                >
-                  Save
-                </Button>
-              </div>
-            </div>{" "}
-            <div className="w-[30%]  bg-white rounded-lg border border-[#E7E7E7]">
-              {" "}
-              <div className="py-3 border-b border-[#E7E7E7]">
-                <p className="ml-5 font-semibold text-base text-[#212B36]">
-                  Assured Person Details
-                </p>
-              </div>
-              {assuredData && (
-                <div class="px-7 pt-10 grid grid-cols-2 gap-6">
-                  <div class="bg-white flex justify-between ">
-                    <div>
-                      <div class="text-base font-medium">Date of Birth</div>
-                      <div class="text-gray-500 text-sm">{formatDate(assuredData.birthDate)}</div>
+              <div className="w-[30%]  bg-white rounded-lg border border-[#E7E7E7]">
+                {" "}
+                <div className="py-3 border-b border-[#E7E7E7]">
+                  <p className="ml-5 font-semibold text-base text-[#212B36]">
+                    Assured Person Details
+                  </p>
+                </div>
+                {assuredData && (
+                  <div class="px-7 pt-10 grid grid-cols-2 gap-6">
+                    <div class="bg-white flex justify-between ">
+                      <div>
+                        <div class="text-base font-medium">Date of Birth</div>
+                        <div class="text-gray-500 text-sm">{formatDate(assuredData.birthDate)}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="bg-white flex justify-between ">
-                    <div>
-                      <div class="text-base font-medium">Employee Status</div>
-                      <div class="text-gray-500 text-sm">{assuredData.employmentStatus}</div>
+                    <div class="bg-white flex justify-between ">
+                      <div>
+                        <div class="text-base font-medium">Employee Status</div>
+                        <div class="text-gray-500 text-sm">{assuredData.employmentStatus}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="bg-white flex justify-between ">
-                    <div>
-                      <div class="text-base font-medium">Gender</div>
-                      <div class="text-gray-500 text-sm">{assuredData.gender}</div>
+                    <div class="bg-white flex justify-between ">
+                      <div>
+                        <div class="text-base font-medium">Gender</div>
+                        <div class="text-gray-500 text-sm">{assuredData.gender}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="bg-white flex justify-between ">
-                    <div>
-                      <div class="text-base font-medium">Start Date</div>
-                      <div class="text-gray-500 text-sm">{formatDate(assuredData.startDate)}</div>
+                    <div class="bg-white flex justify-between ">
+                      <div>
+                        <div class="text-base font-medium">Start Date</div>
+                        <div class="text-gray-500 text-sm">{formatDate(assuredData.startDate)}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="bg-white flex justify-between ">
-                    <div>
-                      <div class="text-base font-medium">Policy</div>
-                      <div class="text-gray-500 text-sm">{assuredData.policyStatus}</div>
+                    <div class="bg-white flex justify-between ">
+                      <div>
+                        <div class="text-base font-medium">Policy</div>
+                        <div class="text-gray-500 text-sm">{assuredData.policyStatus}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="bg-white flex justify-between ">
-                    <div>
-                      <div class="text-base font-medium">End Date</div>
-                      <div class="text-gray-500 text-sm">{formatDate(assuredData.endDate)}</div>
+                    <div class="bg-white flex justify-between ">
+                      <div>
+                        <div class="text-base font-medium">End Date</div>
+                        <div class="text-gray-500 text-sm">{formatDate(assuredData.endDate)}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="bg-white flex justify-between ">
-                    <div>
-                      <div class="text-base font-medium">Assured ID</div>
-                      <div class="text-gray-500 text-sm">{assuredData.assuredID}</div>
+                    <div class="bg-white flex justify-between ">
+                      <div>
+                        <div class="text-base font-medium">Assured ID</div>
+                        <div class="text-gray-500 text-sm">{assuredData.assuredID}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="bg-white flex justify-between ">
-                    <div>
-                      <div class="text-base font-medium">Company Details</div>
-                      <div class="text-gray-500 text-sm">
-                        {assuredData.companyName}
+                    <div class="bg-white flex justify-between ">
+                      <div>
+                        <div class="text-base font-medium">Company Details</div>
+                        <div class="text-gray-500 text-sm">
+                          {assuredData.companyName}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="bg-white flex justify-between ">
+                      <div>
+                        <div class="text-base font-medium">Status</div>
+                        <div class="text-gray-500 text-sm">Assured</div>
                       </div>
                     </div>
                   </div>
-                  <div class="bg-white flex justify-between ">
-                    <div>
-                      <div class="text-base font-medium">Status</div>
-                      <div class="text-gray-500 text-sm">Assured</div>
-                    </div>
-                  </div>
-                </div>
-              )}
+                )}
 
+              </div>
             </div>
-          </div>
+          )}
+
         </div>
       ) : (
         <div className="ml-1 w-full pr-[60px] flex flex-col">
@@ -599,11 +606,11 @@ const PreApproval = (props) => {
             expandable={{
               expandedRowRender,
               rowExpandable: (record) => true,
-              expandedRowKeys: expandedRowKeys,
-              onExpand: (expanded, record) => toggleRowExpansion(record.key),
+              expandedRowKeys: expandedRowKeys, // Use state to control expanded rows
+              onExpand: (expanded, record) => toggleRowExpansion(record.key), // Proper toggle function
             }}
             onRow={(record) => ({
-              onClick: () => toggleRowExpansion(record.key),
+              onClick: () => toggleRowExpansion(record.caseNo),
             })}
           />
         </div>
