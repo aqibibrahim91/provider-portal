@@ -1,22 +1,19 @@
-'use client'
+"use client";
 import { apiClient } from "@/app/api";
 import { formatDate } from "@/utils/utils";
 import { Button, Checkbox, Input, Select, Space, Table } from "antd";
-import {
-    ReceiptText,
-    Save,
-    Search,
-    SquarePen,
-    Trash2,
-    X
-} from "lucide-react";
+import { ReceiptText, Save, Search, SquarePen, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "react-responsive-modal";
 import Avatar from "../../public/images/avatar.jpg";
-import { editCaseDeactive,editCaseActive,addClaimNumber } from "@/components/EditInvoiceSlice";
+import {
+  editCaseDeactive,
+  editCaseActive,
+  addClaimNumber,
+} from "@/components/EditInvoiceSlice";
 import DeleteModal from "@/components/Modal"; // Import the Modal component
 import PrintParentComponent from "@/components/PrintParentComponent";
 import Loader from "@/components/loader";
@@ -24,7 +21,7 @@ import { useSession } from "next-auth/react";
 function InsertClaim() {
   const dispatch = useDispatch();
   const { data: session } = useSession();
-  const [claim, setInsertClaim] = useState(false)
+  const [claim, setInsertClaim] = useState(false);
   const claimNumber = useSelector((state) => state.editCase?.claimNo?.trim()); // Ensure the slice name is correct
   dispatch(editCaseDeactive());
   // const claimNumber = useSelector((state) => state.editCase.claimNumber);
@@ -36,7 +33,7 @@ function InsertClaim() {
   const [isNotAvailable, setIsNotAvailable] = useState(false);
   const [pageIndex, setPageIndex] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-const [printClaim,setPrintClaim] = useState(false)
+  const [printClaim, setPrintClaim] = useState(false);
   const [loading, setLoading] = useState(false);
   const [claimLoad, setClaimLoad] = useState(false);
   const [claimSubmitted, setClaimSubmitted] = useState(false);
@@ -73,6 +70,7 @@ const [printClaim,setPrintClaim] = useState(false)
     diagID: "",
     outPatint: data?.outPatient,
   });
+
   const formatDatee = (date) => {
     if (!date) return ""; // Handle case where date might be undefined or null
     // Check if the date is already in "YYYY-MM-DD" format
@@ -732,407 +730,404 @@ const [printClaim,setPrintClaim] = useState(false)
     const value = e.target.value;
     setClaimNumberInput(value);
   };
-  const updateClaimStatus = ()=>{
-    setPrintClaim(false)
-  }
+  const updateClaimStatus = () => {
+    setPrintClaim(false);
+  };
   return (
     <>
       <Loader loading={loading} />{" "}
-     
-        <div className="mt-[10px] flex flex-col w-full">
-          <div className="font-medium text-2xl">Search Claim No</div>
-          <div className="flex mt-2 pr-[60px] ">
-            <div className="flex justify-between w-full ">
-              <div className="flex">
-                <Input
-                  type="text"
-                  placeholder="Search Claim Number"
-                  value={claimNumberInput}
-                  onChange={handleClaimNumberChange}
-                  className="h-12 w-[270px] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
-                />
+      <div className="mt-[10px] flex flex-col w-full">
+        <div className="font-medium text-2xl">Search Claim No</div>
+        <div className="flex mt-2 pr-[60px] ">
+          <div className="flex justify-between w-full ">
+            <div className="flex">
+              <Input
+                type="text"
+                placeholder="Search Claim Number"
+                value={claimNumberInput}
+                onChange={handleClaimNumberChange}
+                className="h-12 w-[270px] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] placeholder:text-[#ACB6BE] border border-[#E7E7E7]"
+              />
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="bg-[#113493] border-none ml-2.5 text-white h-[46px] w-[46px] font-inter"
+                onClick={() => {
+                  dispatch(editCaseActive());
+                  dispatch(addClaimNumber(claimNumberInput));
+                }}
+                loading={loading}
+              >
+                <Search className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {data && !loading && (
+          <div className="ml-1 w-full lg:pr-[60px]  ">
+            <div className="flex  items-center align-middle justify-between pr-5 lg:pr-auto">
+              <div className="font-medium text-2xl flex">Insert Claim</div>
+
+              <div className="flex items-center ">
                 <Button
                   type="primary"
                   htmlType="submit"
-                  className="bg-[#113493] border-none ml-2.5 text-white h-[46px] w-[46px] font-inter"
-                  onClick={() => {
-                    dispatch(editCaseActive());
-                    dispatch(addClaimNumber(claimNumberInput));
-                  }}
-                  loading={loading}
+                  className="bg-[#11349326] w-[160px] border-none ml-2.5 text-black h-[48px] font-inter font-semibold text-base"
                 >
-                  <Search className="h-5 w-5" />
+                  <Save className="w-6 h-6" />
+                  Scan Docs
                 </Button>
-              </div>
-            </div>
-          </div>
-
-          {data && !loading && (
-            <div className="ml-1 w-full lg:pr-[60px]  ">
-              <div className="flex  items-center align-middle justify-between pr-5 lg:pr-auto">
-                <div className="font-medium text-2xl flex">Insert Claim</div>
-
-                <div className="flex items-center ">
+                <Button
+                  onClick={() => setPrintClaim(true)}
+                  type="primary"
+                  htmlType="submit"
+                  className="bg-[#113493] w-[160px] border-none ml-2.5 text-white h-[48px] font-inter font-semibold text-base"
+                >
+                  Print Claim
+                </Button>{" "}
+                {data?.isSubmitted === null ? (
                   <Button
                     type="primary"
                     htmlType="submit"
-                    className="bg-[#11349326] w-[160px] border-none ml-2.5 text-black h-[48px] font-inter font-semibold text-base"
-                  >
-                    <Save className="w-6 h-6" />
-                    Scan Docs
-                  </Button>
-                  <Button
-                    onClick={() => setPrintClaim(true)}
-                    type="primary"
-                    htmlType="submit"
+                    onClick={() => submitClaim()}
                     className="bg-[#113493] w-[160px] border-none ml-2.5 text-white h-[48px] font-inter font-semibold text-base"
                   >
-                    Print Claim
-                  </Button>{" "}
-                  {data?.isSubmitted === null ? (
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      onClick={() => submitClaim()}
-                      className="bg-[#113493] w-[160px] border-none ml-2.5 text-white h-[48px] font-inter font-semibold text-base"
-                    >
-                      Submit Claim
-                    </Button>
-                  ) : (
-                    ""
-                  )}
-                </div>
-              </div>{" "}
-              <>
-                <div
-                  className={`flex ${
-                    data?.isSubmitted ? "lg:h-[150px]" : "lg:h-[410px]"
-                  }  mt-[22px] pt-5 bg-white rounded-[20px] w-full flex-col`}
-                >
-                  <div className="flex w-full justify-between px-5 ">
-                    <div className="lg:w-[70%] lg:h-[115px] pr-[22px]  border-r border-[#E7E7E7] flex flex-col">
-                      <div className="flex w-full">
+                    Submit Claim
+                  </Button>
+                ) : (
+                  ""
+                )}
+              </div>
+            </div>{" "}
+            <>
+              <div
+                className={`flex ${
+                  data?.isSubmitted ? "lg:h-[150px]" : "lg:h-[410px]"
+                }  mt-[22px] pt-5 bg-white rounded-[20px] w-full flex-col`}
+              >
+                <div className="flex w-full justify-between px-5 ">
+                  <div className="lg:w-[70%] lg:h-[115px] pr-[22px]  border-r border-[#E7E7E7] flex flex-col">
+                    <div className="flex w-full">
+                      {" "}
+                      <Image
+                        alt="mo-data"
+                        src={Avatar}
+                        height={50}
+                        width={50}
+                        className="flex max-h-[50px] rounded-md mt-1"
+                      />
+                      <div className="ml-[15px] w-full">
                         {" "}
-                        <Image
-                          alt="mo-data"
-                          src={Avatar}
-                          height={50}
-                          width={50}
-                          className="flex max-h-[50px] rounded-md mt-1"
-                        />
-                        <div className="ml-[15px] w-full">
+                        <div className="font-medium font-base text-[#212B36] ">
                           {" "}
-                          <div className="font-medium font-base text-[#212B36] ">
-                            {" "}
-                            {data?.assuredNameE}
-                          </div>
-                          <div className="font-medium font-base text-[#212B36]">
-                            {" "}
-                            {data?.assuredName}
-                          </div>
+                          {data?.assuredNameE}
                         </div>
-                        <div className="flex gap-2.5 ">
-                          <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] max-w-[65px] h-[28px] rounded-md align-middle items-center">
-                            <p className="text-sm font-medium text-white">
-                              {" "}
-                              {data?.gender}
-                            </p>
-                          </div>{" "}
-                          <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] w-[75px] h-[28px] rounded-md align-middle items-center">
-                            {data?.employmentStatus ? (
-                              <p className="text-sm font-medium text-white">
-                                {" "}
-                                In Active
-                              </p>
-                            ) : (
-                              ""
-                            )}{" "}
-                          </div>{" "}
-                          <div className="flex justify-center bg-[#3056D3] px-2 py-[3px] w-24 h-[28px] rounded-md align-middle items-center">
-                            {data?.outPatient ? (
-                              <p className="text-sm font-medium text-white">
-                                Out Patient
-                              </p>
-                            ) : (
-                              <p className="text-sm font-medium text-white">
-                                {" "}
-                                In Patient
-                              </p>
-                            )}
-                          </div>{" "}
+                        <div className="font-medium font-base text-[#212B36]">
+                          {" "}
+                          {data?.assuredName}
                         </div>
                       </div>
-                      <div className=" lg:h-[41px] py-[22px] flex gap-4 flex-wrap lg:gap-[44px]">
-                        <div className="flex flex-col align-middle ">
-                          <div className="flex text-md font-semibold">
-                            Birth Date
-                          </div>
-                          <p className="flex text-[#637381] font-medium  text-sm">
-                            {formatDate(data?.birthDate)}
+                      <div className="flex gap-2.5 ">
+                        <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] max-w-[65px] h-[28px] rounded-md align-middle items-center">
+                          <p className="text-sm font-medium text-white">
+                            {" "}
+                            {data?.gender}
                           </p>
                         </div>{" "}
-                        <div className="flex flex-col align-middle ">
-                          <div className="flex text-md font-semibold">
-                            Assured ID
-                          </div>
-                          <p className="flex text-[#637381] font-medium  text-sm">
-                            {data?.assuredID}
-                          </p>
+                        <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] w-[75px] h-[28px] rounded-md align-middle items-center">
+                          {data?.employmentStatus ? (
+                            <p className="text-sm font-medium text-white">
+                              {" "}
+                              In Active
+                            </p>
+                          ) : (
+                            ""
+                          )}{" "}
                         </div>{" "}
-                        <div className="flex flex-col align-middle ">
-                          <div className="flex text-md font-semibold">
-                            Batch No
-                          </div>
-                          <p className="flex text-[#637381] font-medium  text-sm">
-                            {data?.batchNumber}
-                          </p>
+                        <div className="flex justify-center bg-[#3056D3] px-2 py-[3px] w-24 h-[28px] rounded-md align-middle items-center">
+                          {data?.outPatient ? (
+                            <p className="text-sm font-medium text-white">
+                              Out Patient
+                            </p>
+                          ) : (
+                            <p className="text-sm font-medium text-white">
+                              {" "}
+                              In Patient
+                            </p>
+                          )}
                         </div>{" "}
-                        <div className="flex flex-col align-middle ">
-                          <div className="flex text-md font-semibold">
-                            Claim No
-                          </div>
-                          <p className="flex text-[#637381] font-medium  text-sm">
-                            {claimNo}
-                          </p>
-                        </div>{" "}
-                        {/* <div className="flex flex-col align-middle ">
+                      </div>
+                    </div>
+                    <div className=" lg:h-[41px] py-[22px] flex gap-4 flex-wrap lg:gap-[44px]">
+                      <div className="flex flex-col align-middle ">
+                        <div className="flex text-md font-semibold">
+                          Birth Date
+                        </div>
+                        <p className="flex text-[#637381] font-medium  text-sm">
+                          {formatDate(data?.birthDate)}
+                        </p>
+                      </div>{" "}
+                      <div className="flex flex-col align-middle ">
+                        <div className="flex text-md font-semibold">
+                          Assured ID
+                        </div>
+                        <p className="flex text-[#637381] font-medium  text-sm">
+                          {data?.assuredID}
+                        </p>
+                      </div>{" "}
+                      <div className="flex flex-col align-middle ">
+                        <div className="flex text-md font-semibold">
+                          Batch No
+                        </div>
+                        <p className="flex text-[#637381] font-medium  text-sm">
+                          {data?.batchNumber}
+                        </p>
+                      </div>{" "}
+                      <div className="flex flex-col align-middle ">
+                        <div className="flex text-md font-semibold">
+                          Claim No
+                        </div>
+                        <p className="flex text-[#637381] font-medium  text-sm">
+                          {claimNo}
+                        </p>
+                      </div>{" "}
+                      {/* <div className="flex flex-col align-middle ">
                 <div className="flex text-md font-semibold">Birth Date</div>
                 <p className="flex text-[#637381] font-medium  text-sm">
                   24th July, 1985
                 </p>
               </div>{" "} */}
-                        <div className="flex flex-col align-middle ">
-                          <div className="flex text-md font-semibold">
-                            Entered by
-                          </div>
-                          <p className="flex text-[#637381] font-medium  text-sm ">
-                            {data?.enteredBy}
-                          </p>
+                      <div className="flex flex-col align-middle ">
+                        <div className="flex text-md font-semibold">
+                          Entered by
                         </div>
-                      </div>
-                    </div>
-                    <div className="w-[30%] pl-[22px] h-[115px] flex align-middle items-center  m-auto justify-center">
-                      <div className="flex lg:gap-[62px] flex-col lg:flex-row">
-                        <div className="lg:w-[114px]  flex flex-col">
-                          <p className="font-bold text-[28px]  flex justify-center ">
-                            {data?.serviceGross}
-                          </p>
-                          <div className="flex w-full text-base text-[#637381] justify-center  ">
-                            <p className="flex text-center"> Services Gross</p>
-                          </div>
-                        </div>
-                        <div className="w-[114px]">
-                          <p className="font-bold text-[28px] flex justify-center ">
-                            {data?.totalServices}
-                          </p>
-                          <p className="flex text-base text-[#637381]">
-                            Total Services
-                          </p>
-                        </div>
+                        <p className="flex text-[#637381] font-medium  text-sm ">
+                          {data?.enteredBy}
+                        </p>
                       </div>
                     </div>
                   </div>
-                  {!data?.isSubmitted && (
-                    <>
-                      <div className="border border-[#E7E7E7] my-[22px]  mx-5" />
-
-                      <form onSubmit={handleSubmit} className="w-full">
-                        <div className="flex align-middle pl-2.5 w-full ">
-                          <div className="flex gap-2.5 w-full">
-                            <div className="flex w-full flex-col lg:flex-row gap-2.5">
-                              <div className="flex flex-col w-full  ">
-                                <div className="flex text-md font-semibold justify-between w-full ">
-                                  <p className="flex"> Invoice#</p>
-                                  <div className="flex gap-2 items-center align-middle">
-                                    <Checkbox
-                                      onChange={handleCheckboxChange}
-                                      className="   w-4 h-4 uppercase flex "
-                                      checked={isNotAvailable}
-                                    />
-                                    <span className=" !font-inter text-sm  flex ">
-                                      Not Available
-                                    </span>
-                                  </div>
-                                </div>
-                                <Input
-                                  type="text"
-                                  name="invoiceNumber"
-                                  placeholder="Enter Invoice#"
-                                  className="h-12 px-3 w-full   mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
-                                  value={
-                                    edit
-                                      ? formState.orignalInv
-                                      : formState.invoiceNumber
-                                  }
-                                  disabled={isNotAvailable}
-                                  onChange={handleChange}
-                                />
-                              </div>
-                              <div className="flex flex-col lg:w-full">
-                                <div className="flex text-md font-semibold">
-                                  Treatment Date
-                                </div>
-                                <input
-                                  type="date"
-                                  className="h-12 mt-3 px-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
-                                  value={formatDatee(formState.treatmentDate)}
-                                  onChange={(e) => {
-                                    setFormState((prevState) => ({
-                                      ...prevState,
-                                      treatmentDate: e.target.value,
-                                    }));
-                                  }}
-                                  max={new Date().toLocaleDateString("en-CA")}
-                                  min={new Date(
-                                    "2000-01-01"
-                                  ).toLocaleDateString("en-CA")}
-                                />
-                              </div>
-                            </div>
-                            <div className="flex flex-col lg:flex-row w-full gap-2.5">
-                              <div className="flex flex-col lg:w-full pr-2 ">
-                                <div className="flex text-md font-semibold">
-                                  Provider Medical Service
-                                </div>
-                                <Select
-                                  showSearch
-                                  value={
-                                    formState?.providerMedicalService
-                                      ? formState?.providerMedicalService
-                                      : "Select Provider Medical Service"
-                                  }
-                                  className="h-12 mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
-                                  options={providerMedicalServices}
-                                  loading={loading}
-                                  onChange={handleSelectChange(
-                                    "providerMedicalService"
-                                  )}
-                                  filterOption={(input, option) =>
-                                    option.label
-                                      .toLowerCase()
-                                      .includes(input.toLowerCase())
-                                  }
-                                  optionFilterProp="label"
-                                  placeholder="Provider Medical Service"
-                                  allowClear
-                                />
-                              </div>
-                              <div className="flex flex-col lg:w-full pr-2 ">
-                                <div className="flex text-md font-semibold">
-                                  Medical Service
-                                </div>
-                                <Select
-                                  showSearch
-                                  value={
-                                    formState?.medicalService
-                                      ? formState?.medicalService
-                                      : "Select Medical Service"
-                                  }
-                                  defaultValue="Select Medical Service"
-                                  className="h-12 mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
-                                  options={medicalServices}
-                                  loading={loading}
-                                  optionFilterProp="label"
-                                  onChange={handleSelectChange(
-                                    "medicalService"
-                                  )}
-                                  allowClear
-                                />
-                              </div>
-                            </div>
-                          </div>
+                  <div className="w-[30%] pl-[22px] h-[115px] flex align-middle items-center  m-auto justify-center">
+                    <div className="flex lg:gap-[62px] flex-col lg:flex-row">
+                      <div className="lg:w-[114px]  flex flex-col">
+                        <p className="font-bold text-[28px]  flex justify-center ">
+                          {data?.serviceGross}
+                        </p>
+                        <div className="flex w-full text-base text-[#637381] justify-center  ">
+                          <p className="flex text-center"> Services Gross</p>
                         </div>
-                        <div className="flex align-middle px-2.5 mt-[22px] w-full mb-5 lg:mb-0">
-                          <div className="grid grid-cols-2 lg:flex gap-2.5 w-full">
-                            <div className="flex flex-col lg:w-1/4">
-                              <div className="flex text-md font-semibold">
-                                Gross
-                              </div>
-                              <Input
-                                type="number"
-                                name="gross"
-                                value={formState.gross}
-                                placeholder="Enter Gross"
-                                className="h-12 px-3  mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
-                                onChange={handleChange}
-                                min={0}
-                              />
-                            </div>
-                            <div className="flex flex-col lg:w-1/4">
-                              <div className="flex text-md font-semibold">
-                                Note (If Any)
+                      </div>
+                      <div className="w-[114px]">
+                        <p className="font-bold text-[28px] flex justify-center ">
+                          {data?.totalServices}
+                        </p>
+                        <p className="flex text-base text-[#637381]">
+                          Total Services
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {!data?.isSubmitted && (
+                  <>
+                    <div className="border border-[#E7E7E7] my-[22px]  mx-5" />
+
+                    <form onSubmit={handleSubmit} className="w-full">
+                      <div className="flex align-middle pl-2.5 w-full ">
+                        <div className="flex gap-2.5 w-full">
+                          <div className="flex w-full flex-col lg:flex-row gap-2.5">
+                            <div className="flex flex-col w-full  ">
+                              <div className="flex text-md font-semibold justify-between w-full ">
+                                <p className="flex"> Invoice#</p>
+                                <div className="flex gap-2 items-center align-middle">
+                                  <Checkbox
+                                    onChange={handleCheckboxChange}
+                                    className="   w-4 h-4 uppercase flex "
+                                    checked={isNotAvailable}
+                                  />
+                                  <span className=" !font-inter text-sm  flex ">
+                                    Not Available
+                                  </span>
+                                </div>
                               </div>
                               <Input
                                 type="text"
-                                name="note"
-                                placeholder="Enter Note"
-                                className="h-12 px-3  mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
-                                value={formState.note}
+                                name="invoiceNumber"
+                                placeholder="Enter Invoice#"
+                                className="h-12 px-3 w-full   mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
+                                value={
+                                  edit
+                                    ? formState.orignalInv
+                                    : formState.invoiceNumber
+                                }
+                                disabled={isNotAvailable}
                                 onChange={handleChange}
                               />
                             </div>
-                            <div className="flex flex-col lg:w-1/4">
+                            <div className="flex flex-col lg:w-full">
                               <div className="flex text-md font-semibold">
-                                Currency
+                                Treatment Date
                               </div>
                               <input
-                                type="text"
-                                readOnly
-                                value={"LYD"}
-                                onChange={handleChange}
-                                className="h-12 px-3  mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
-                                placeholder="Enter Currency"
+                                type="date"
+                                className="h-12 mt-3 px-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
+                                value={formatDatee(formState.treatmentDate)}
+                                onChange={(e) => {
+                                  setFormState((prevState) => ({
+                                    ...prevState,
+                                    treatmentDate: e.target.value,
+                                  }));
+                                }}
+                                max={new Date().toLocaleDateString("en-CA")}
+                                min={new Date("2000-01-01").toLocaleDateString(
+                                  "en-CA"
+                                )}
                               />
                             </div>
-                            <div className="flex flex-col items-center justify-end lg:w-1/4 pr-2">
-                              <Button
-                                type="primary"
-                                htmlType="submit"
-                                className="bg-[#113493] border-none w-full  text-white h-[48px] font-inter font-semibold text-base"
-                              >
-                                <ReceiptText />
-                                {edit ? "Save Invoice" : "Add Invoice"}
-                              </Button>
+                          </div>
+                          <div className="flex flex-col lg:flex-row w-full gap-2.5">
+                            <div className="flex flex-col lg:w-full pr-2 ">
+                              <div className="flex text-md font-semibold">
+                                Provider Medical Service
+                              </div>
+                              <Select
+                                showSearch
+                                value={
+                                  formState?.providerMedicalService
+                                    ? formState?.providerMedicalService
+                                    : "Select Provider Medical Service"
+                                }
+                                className="h-12 mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
+                                options={providerMedicalServices}
+                                loading={loading}
+                                onChange={handleSelectChange(
+                                  "providerMedicalService"
+                                )}
+                                filterOption={(input, option) =>
+                                  option.label
+                                    .toLowerCase()
+                                    .includes(input.toLowerCase())
+                                }
+                                optionFilterProp="label"
+                                placeholder="Provider Medical Service"
+                                allowClear
+                              />
+                            </div>
+                            <div className="flex flex-col lg:w-full pr-2 ">
+                              <div className="flex text-md font-semibold">
+                                Medical Service
+                              </div>
+                              <Select
+                                showSearch
+                                value={
+                                  formState?.medicalService
+                                    ? formState?.medicalService
+                                    : "Select Medical Service"
+                                }
+                                defaultValue="Select Medical Service"
+                                className="h-12 mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
+                                options={medicalServices}
+                                loading={loading}
+                                optionFilterProp="label"
+                                onChange={handleSelectChange("medicalService")}
+                                allowClear
+                              />
                             </div>
                           </div>
                         </div>
-                      </form>
-                    </>
-                  )}
-                </div>
-                <div className=" flex  mt-[22px]  bg-white rounded-[20px] w-full flex-col">
-                  <Table
-                    columns={columns}
-                    dataSource={tableData}
-                    className={`!font-inter`}
-                    onChange={handleDataChange}
-                    pagination={{
-                      current: pageIndex,
-                      total: totalCount, // total count returned from backend
-                    }}
-                  />
-                  <DeleteModal
-                    isOpen={isModalOpen}
-                    onClose={handleCloseModal}
-                    onConfirm={handleConfirmDelete}
-                    record={selectedRow}
-                    session={session}
-                  />
-                </div>{" "}
-              </>
-            </div>
-          )}
-        </div>
-    {printClaim && <div className="w-full flex justify-center">
+                      </div>
+                      <div className="flex align-middle px-2.5 mt-[22px] w-full mb-5 lg:mb-0">
+                        <div className="grid grid-cols-2 lg:flex gap-2.5 w-full">
+                          <div className="flex flex-col lg:w-1/4">
+                            <div className="flex text-md font-semibold">
+                              Gross
+                            </div>
+                            <Input
+                              type="number"
+                              name="gross"
+                              value={formState.gross}
+                              placeholder="Enter Gross"
+                              className="h-12 px-3  mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
+                              onChange={handleChange}
+                              min={0}
+                            />
+                          </div>
+                          <div className="flex flex-col lg:w-1/4">
+                            <div className="flex text-md font-semibold">
+                              Note (If Any)
+                            </div>
+                            <Input
+                              type="text"
+                              name="note"
+                              placeholder="Enter Note"
+                              className="h-12 px-3  mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
+                              value={formState.note}
+                              onChange={handleChange}
+                            />
+                          </div>
+                          <div className="flex flex-col lg:w-1/4">
+                            <div className="flex text-md font-semibold">
+                              Currency
+                            </div>
+                            <input
+                              type="text"
+                              readOnly
+                              value={"LYD"}
+                              onChange={handleChange}
+                              className="h-12 px-3  mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
+                              placeholder="Enter Currency"
+                            />
+                          </div>
+                          <div className="flex flex-col items-center justify-end lg:w-1/4 pr-2">
+                            <Button
+                              type="primary"
+                              htmlType="submit"
+                              className="bg-[#113493] border-none w-full  text-white h-[48px] font-inter font-semibold text-base"
+                            >
+                              <ReceiptText />
+                              {edit ? "Save Invoice" : "Add Invoice"}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </>
+                )}
+              </div>
+              <div className=" flex  mt-[22px]  bg-white rounded-[20px] w-full flex-col">
+                <Table
+                  columns={columns}
+                  dataSource={tableData}
+                  className={`!font-inter`}
+                  onChange={handleDataChange}
+                  pagination={{
+                    current: pageIndex,
+                    total: totalCount, // total count returned from backend
+                  }}
+                />
+                <DeleteModal
+                  isOpen={isModalOpen}
+                  onClose={handleCloseModal}
+                  onConfirm={handleConfirmDelete}
+                  record={selectedRow}
+                  session={session}
+                />
+              </div>{" "}
+            </>
+          </div>
+        )}
+      </div>
+      {printClaim && (
+        <div className="w-full flex justify-center">
           <PrintParentComponent
-          onclick = {updateClaimStatus}
+            onclick={updateClaimStatus}
             // setPrintClaim={setPrintClaim}
             data={data}
             session={session}
           />
-        </div> }
-        
-     
+        </div>
+      )}
       <Modal
         open={submitConfirmation}
         center

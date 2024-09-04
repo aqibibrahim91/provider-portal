@@ -6,7 +6,7 @@ import BatchData from "@/components/BatchData";
 import { apiClient } from "@/app/api";
 import Loader from "@/components/loader";
 import HealthCareDetails from "@/components/HealthCareDetails"; // import your HealthcareDetails component
-import { getServerSession } from "next-auth/next";
+
 // Ensure this import is correct
 import { useSession } from "next-auth/react";
 
@@ -29,7 +29,12 @@ export default function Dashboard() {
   useEffect(() => {
     if (session) {
       setToken(session.user?.image);
-      fetchData(pagination.current, pagination.pageSize, session.user?.email, session.user?.image);
+      fetchData(
+        pagination.current,
+        pagination.pageSize,
+        session.user?.email,
+        session.user?.image
+      );
       fetchProviderData(session.user?.email, session.user?.image);
     }
   }, [pagination.current, pagination.pageSize, session]);
@@ -142,12 +147,12 @@ export default function Dashboard() {
           item.status === "Auditing"
             ? "Auditing"
             : item.status === "Dispatching"
-              ? "Dispatching"
-              : item.status === "Rejected"
-                ? "Rejected"
-                : item.status === "Completed"
-                  ? "Completed"
-                  : "Unknown", // Handle any unexpected statuses
+            ? "Dispatching"
+            : item.status === "Rejected"
+            ? "Rejected"
+            : item.status === "Completed"
+            ? "Completed"
+            : "Unknown", // Handle any unexpected statuses
       })) || []
     );
   };
@@ -259,10 +264,7 @@ export default function Dashboard() {
           onCloseBatch={handleCloseBatch}
         />
       ) : showDetails ? (
-        <HealthCareDetails
-          onClose={handleCloseDetails} 
-          session={session}
-        />
+        <HealthCareDetails onClose={handleCloseDetails} session={session} />
       ) : (
         <div className="flex w-full flex-col lg:pr-[60px]">
           <div className="h-[95px] flex align-middle justify-between items-center bg-[#E7E7E7] rounded-lg">

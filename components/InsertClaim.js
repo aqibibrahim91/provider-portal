@@ -26,12 +26,7 @@ import PrintParentComponent from "./PrintParentComponent";
 import { addClaimNumber, editCaseActive } from "../components/EditInvoiceSlice";
 import Modal from "react-responsive-modal";
 
-function InsertClaim({
-  session,
-  setInsertClaim,
-  setPrintClaim,
-  printClaim,
-}) {
+function InsertClaim({ session, setInsertClaim, setPrintClaim, printClaim }) {
   const dispatch = useDispatch();
   const claimNumber = useSelector((state) => state.editCase?.claimNo?.trim()); // Ensure the slice name is correct
   dispatch(editCaseDeactive());
