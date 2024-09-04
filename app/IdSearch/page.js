@@ -1,38 +1,30 @@
-import React, { useEffect, useState } from "react";
-import { Button, Input } from "antd";
-import avatar from "../public/images/avatar.jpg";
-import Image from "next/image";
-import {
-  Mail,
-  MapPin,
-  CalendarCheck2,
-  CalendarX2,
-  NotebookTabs,
-  Search,
-} from "lucide-react";
-import { formatDate } from "../utils/utils";
-import noData from "../public/images/Missing.png";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addClaimNumber,
-  removeClaimNumber,
-  setSearchID,
-  deleteSearchID,
-} from "./EditInvoiceSlice";
+'use client'
 import { apiClient } from "@/app/api";
-function IDSearch({
-  session,
-  setInsertClaim,
-  setAssuredIDNew,
-  assuredIDNew,
-  setInsertResponse,
-}) {
+import { formatDate } from "@/utils/utils";
+import { Button, Input } from "antd";
+import {
+    CalendarCheck2,
+    CalendarX2,
+    Mail,
+    MapPin,
+    NotebookTabs,
+    Search,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useSession } from "next-auth/react";
+import { addClaimNumber,setSearchID } from "@/components/EditInvoiceSlice";
+
+function IDSearch() {
   const dispatch = useDispatch();
+  const { data: session } = useSession();
   const searchHeaderValue = useSelector((state) => state.editCase.searchID);
   const [data, setData] = useState();
+  const [claim, setInsertClaim] = useState(false)
   const [loading, setLoading] = useState(false);
   const [assuredID, setAssuredID] = useState();
-
+  const [insertResponse, setInsertResponse] = useState("");
+  const [assuredIDNew, setAssuredIDNew] = useState("");
   const fetchData = async () => {
     if (!searchHeaderValue) {
       return;

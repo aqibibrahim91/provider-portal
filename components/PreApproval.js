@@ -5,40 +5,41 @@ import { apiClient } from "@/app/api";
 import Loader from "./loader";
 import { formatDate } from "@/utils/utils";
 import toast from "react-hot-toast";
-import moment from 'moment'; // Import moment
+import moment from "moment"; // Import moment
+import { useSession } from "next-auth/react";
 
 const PreApproval = (props) => {
+  const { data: session } = useSession;
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [newCase, setNewCase] = useState(false);
-  const [data, setData] = useState([])
+  const [data, setData] = useState([]);
   const [load, setLoad] = useState(false);
-  const [assuredSearch, setAssuredSearch] = useState("")
-  const [assuredData, setAssuredData] = useState()
-  const [medicalService, setMedicalService] = useState("")
-  const [phoneNumber, setPhoneNumber] = useState("")
+  const [assuredSearch, setAssuredSearch] = useState("");
+  const [assuredData, setAssuredData] = useState();
+  const [medicalService, setMedicalService] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [doctor, setDoctor] = useState("");
-  const [doctorContactNo, setDoctorContactNo] = useState("")
-  const [caseDate, setCaseDate] = useState("")
-  const [admissionDate, setAdmissionDate] = useState("")
-  const [dischargeDate, setDischargeDate] = useState("")
-  const [symptoms, setSymptoms] = useState("")
-  const [treatmentNotes, setTreatmentNotes] = useState("")
-  const [diagnosis, setDiagnosis] = useState("")
-  const [estimatedCost, setEstimatedCost] = useState("")
-  const [additionalNotes, setAdditionalNotes] = useState("")
-  const [admissionError, setAdmissionError] = useState(false)
-  const [dischargeError, setDischargeError] = useState(false)
-  const [caseDateError, setCaseDateError] = useState(false)
-  const [caseNumber, setCaseNumber] = useState("")
-
+  const [doctorContactNo, setDoctorContactNo] = useState("");
+  const [caseDate, setCaseDate] = useState("");
+  const [admissionDate, setAdmissionDate] = useState("");
+  const [dischargeDate, setDischargeDate] = useState("");
+  const [symptoms, setSymptoms] = useState("");
+  const [treatmentNotes, setTreatmentNotes] = useState("");
+  const [diagnosis, setDiagnosis] = useState("");
+  const [estimatedCost, setEstimatedCost] = useState("");
+  const [additionalNotes, setAdditionalNotes] = useState("");
+  const [admissionError, setAdmissionError] = useState(false);
+  const [dischargeError, setDischargeError] = useState(false);
+  const [caseDateError, setCaseDateError] = useState(false);
+  const [caseNumber, setCaseNumber] = useState("");
 
   useEffect(() => {
-    getPreApprovalData()
-  }, [])
+    getPreApprovalData();
+  }, []);
 
   const getAssuredPerson = async (cardNumber = assuredSearch) => {
     setLoad(true);
-    const token = props.session?.user?.image;
+    const token = session?.user?.image;
     const response = await apiClient(
       `${process.env.NEXT_PUBLIC_API_URL}/api/AssuredPerson/GetAssuredPerson?cardNumber=${cardNumber}`,
       {
@@ -54,7 +55,7 @@ const PreApproval = (props) => {
 
     if (!response.ok) {
       console.error("HTTP Error:", response.status, response.statusText);
-      setAssuredData()
+      setAssuredData();
     }
 
     const text = await response.text();
@@ -67,23 +68,21 @@ const PreApproval = (props) => {
 
     try {
       const result = JSON.parse(text);
-      // setData(result?.successResponse);
-      // setAssuredIDNew(result?.successResponse?.assuredSearch);
+
       console.log("API Response:", result);
       if (result?.isRequestSuccessful) {
-        setAssuredData(result?.successResponse)
+        setAssuredData(result?.successResponse);
+      } else {
+        setAssuredData();
       }
-      else {
-        setAssuredData()
-      }
-
     } catch (jsonError) {
       console.error("Error parsing JSON response:", jsonError);
     }
-  }
+  };
   const getPreApprovalData = async () => {
-    const id = props.session?.user?.email;
-    const token = props.session?.user?.image;
+    const id = session?.user?.email;
+
+    const token = session?.user?.image;
     setLoad(true);
     const response = await apiClient(
       `${process.env.NEXT_PUBLIC_API_URL}/api/PreApproval/GetAll?pID=${id}`,
@@ -95,7 +94,7 @@ const PreApproval = (props) => {
           "Content-Type": "application/json",
         },
       }
-    )
+    );
     setLoad(false);
     if (!response.ok) {
       toast?.error("No Data Found");
@@ -115,26 +114,32 @@ const PreApproval = (props) => {
     } catch (jsonError) {
       console.error("Error parsing JSON response:", jsonError);
     }
-  }
+  };
   const handleSubmit = async () => {
-    if (admissionDate == null || admissionDate == "" ||
-      caseDate == null || caseDate == "" ||
-      dischargeDate == null || dischargeDate == "" ||
-      assuredData == null || assuredData?.assuredID == null || assuredData?.assuredID == "") {
+    if (
+      admissionDate == null ||
+      admissionDate == "" ||
+      caseDate == null ||
+      caseDate == "" ||
+      dischargeDate == null ||
+      dischargeDate == "" ||
+      assuredData == null ||
+      assuredData?.assuredID == null ||
+      assuredData?.assuredID == ""
+    ) {
       if (admissionDate == null || admissionDate == "") {
-        setAdmissionError(true)
+        setAdmissionError(true);
       }
       if (caseDate == null || caseDate == "") {
-        setCaseDateError(true)
+        setCaseDateError(true);
       }
       if (dischargeDate == null || dischargeDate == "") {
-        setDischargeError(true)
+        setDischargeError(true);
       }
       if (assuredData?.assuredID == null || assuredData?.assuredID == "") {
-        toast.error("Please search Assured Person first!", { id: 1 })
+        toast.error("Please search Assured Person first!", { id: 1 });
       }
-    }
-    else {
+    } else {
       const id = props.session?.user?.email;
       const token = props.session?.user?.image;
       var request = {
@@ -151,20 +156,23 @@ const PreApproval = (props) => {
         diagnosis: diagnosis,
         treatment: treatmentNotes,
         cost: estimatedCost.toString(),
-        caseNo: caseNumber
-      }
-      console.log("req: ", request)
+        caseNo: caseNumber,
+      };
+      console.log("req: ", request);
 
       setLoad(true);
-      const response = await apiClient(`${process.env.NEXT_PUBLIC_API_URL}/api/PreApproval/UpsertInPatient`, {
-        method: "POST",
-        headers: {
-          "ngrok-skip-browser-warning": true,
-          "Content-type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(request),
-      });
+      const response = await apiClient(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/PreApproval/UpsertInPatient`,
+        {
+          method: "POST",
+          headers: {
+            "ngrok-skip-browser-warning": true,
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(request),
+        }
+      );
       setLoad(false);
       if (!response.ok) {
         toast?.error("No Data Found");
@@ -180,15 +188,14 @@ const PreApproval = (props) => {
       try {
         const result = JSON.parse(text);
         console.log("API Response:", result);
-        getPreApprovalData()
-
+        getPreApprovalData();
       } catch (jsonError) {
         console.error("Error parsing JSON response:", jsonError);
       }
-      clearFormData()
-      setNewCase(false)
+      clearFormData();
+      setNewCase(false);
     }
-  }
+  };
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
     { title: "Case No", dataIndex: "caseNo", key: "caseNo" },
@@ -199,58 +206,63 @@ const PreApproval = (props) => {
       title: "Approval Status",
       dataIndex: "status",
       key: "status",
-      render: (_, record) => (
-        <>{record.status ? "Approved" : "Pending"}</>
-      )
+      render: (_, record) => <>{record.status ? "Approved" : "Pending"}</>,
     },
     {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
           <a>
-            <SquarePen onClick={() => handleEdit(record)} className="text-[#2B3F6C]" />
+            <SquarePen
+              onClick={() => handleEdit(record)}
+              className="text-[#2B3F6C]"
+            />
           </a>
         </Space>
       ),
     },
   ];
 
-
   const handleEdit = async (record) => {
-    setPhoneNumber(record.assuredContactNo)
-    setDoctor(record.doctorName)
-    setDoctorContactNo(record.doctorContactNo)
-    setCaseDate(record.caseDate ? moment(record.caseDate, 'DD/MM/YYYY') : "")
-    setAdmissionDate(record.admissionDate ? moment(record.admissionDate, 'DD/MM/YYYY') : "")
-    setDischargeDate(record.dischargeDate ? moment(record.dischargeDate, 'DD/MM/YYYY') : "")
-    setSymptoms(record.symptoms)
-    setTreatmentNotes(record.treatment)
-    setDiagnosis(record.diagnosis)
-    setEstimatedCost(record.cost)
-    setAssuredSearch(record.name)
-    setCaseNumber(record.caseNo)
-    setNewCase(true)
-    await getAssuredPerson(record.assuredID)
-  }
+    setPhoneNumber(record.assuredContactNo);
+    setDoctor(record.doctorName);
+    setDoctorContactNo(record.doctorContactNo);
+    setCaseDate(record.caseDate ? moment(record.caseDate, "DD/MM/YYYY") : "");
+    setAdmissionDate(
+      record.admissionDate ? moment(record.admissionDate, "DD/MM/YYYY") : ""
+    );
+    setDischargeDate(
+      record.dischargeDate ? moment(record.dischargeDate, "DD/MM/YYYY") : ""
+    );
+    setSymptoms(record.symptoms);
+    setTreatmentNotes(record.treatment);
+    setDiagnosis(record.diagnosis);
+    setEstimatedCost(record.cost);
+    setAssuredSearch(record.name);
+    setCaseNumber(record.caseNo);
+    setNewCase(true);
+    await getAssuredPerson(record.assuredID);
+  };
   const clearFormData = () => {
-    setPhoneNumber("")
-    setDoctor("")
-    setDoctorContactNo("")
-    setCaseDate("")
-    setAdmissionDate("")
-    setDischargeDate("")
-    setSymptoms("")
-    setTreatmentNotes("")
-    setDiagnosis("")
-    setEstimatedCost("")
-    setAdditionalNotes("")
-  }
+    setPhoneNumber("");
+    setDoctor("");
+    setDoctorContactNo("");
+    setCaseDate("");
+    setAdmissionDate("");
+    setDischargeDate("");
+    setSymptoms("");
+    setTreatmentNotes("");
+    setDiagnosis("");
+    setEstimatedCost("");
+    setAdditionalNotes("");
+  };
 
   const toggleRowExpansion = (key) => {
-    setExpandedRowKeys((prevExpandedKeys) =>
-      prevExpandedKeys.includes(key)
-        ? prevExpandedKeys.filter((k) => k !== key) // Collapse the row if already expanded
-        : [...prevExpandedKeys, key] // Expand the row if not already expanded
+    setExpandedRowKeys(
+      (prevExpandedKeys) =>
+        prevExpandedKeys.includes(key)
+          ? prevExpandedKeys.filter((k) => k !== key) // Collapse the row if already expanded
+          : [...prevExpandedKeys, key] // Expand the row if not already expanded
     );
   };
 
@@ -277,7 +289,6 @@ const PreApproval = (props) => {
       </div>
     </div>
   );
-
 
   return (
     <>
@@ -347,9 +358,7 @@ const PreApproval = (props) => {
                 </div>{" "}
                 <div className="mt-8 w-full flex px-5 gap-[11px]">
                   <div className="w-1/2">
-                    <div className="mb-2 w-full !font-medium">
-                      Doctor Name
-                    </div>{" "}
+                    <div className="mb-2 w-full !font-medium">Doctor Name</div>{" "}
                     <Input
                       type="invoice_number"
                       onChange={(e) => setDoctor(e.target.value)}
@@ -375,25 +384,27 @@ const PreApproval = (props) => {
                       className="h-12 px-3  placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
                     />
                   </div>{" "}
-
                 </div>{" "}
                 <div className="mt-8 w-full flex px-5 gap-[11px]">
-                  <div className={`w-1/2 ${admissionError ? "border-red" : ""}`}>
+                  <div
+                    className={`w-1/2 ${admissionError ? "border-red" : ""}`}
+                  >
                     {" "}
                     <div className="mb-2 w-full !font-medium">
                       Estimated Date of Admission
                     </div>{" "}
                     <DatePicker
                       onChange={(e) => {
-                        setAdmissionDate(e)
-                        setAdmissionError(false)
-                      }
-                      }
+                        setAdmissionDate(e);
+                        setAdmissionError(false);
+                      }}
                       value={admissionDate}
                       className="h-12 w-full placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
                     />
                   </div>{" "}
-                  <div className={`w-1/2 ${dischargeError ? "border-red" : ""}`}>
+                  <div
+                    className={`w-1/2 ${dischargeError ? "border-red" : ""}`}
+                  >
                     <div className="mb-2 w-full !font-medium">
                       {" "}
                       Estimated Date of Discharge
@@ -401,8 +412,8 @@ const PreApproval = (props) => {
                     <DatePicker
                       value={dischargeDate}
                       onChange={(e) => {
-                        setDischargeDate(e)
-                        setDischargeError(false)
+                        setDischargeDate(e);
+                        setDischargeError(false);
                       }}
                       className="h-12 w-full placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
                     />
@@ -415,12 +426,11 @@ const PreApproval = (props) => {
                     <DatePicker
                       value={caseDate}
                       onChange={(e) => {
-                        setCaseDate(e)
-                        setCaseDateError(false)
+                        setCaseDate(e);
+                        setCaseDateError(false);
                       }}
                       className="h-12 w-full placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px]  border border-[#E7E7E7]"
-                    />
-                    {" "}
+                    />{" "}
                   </div>{" "}
                   <div className="w-1/2">
                     <div className="mb-2 w-full !font-medium"> Diagnosis</div>
@@ -465,7 +475,6 @@ const PreApproval = (props) => {
                   </div>{" "}
                 </div>{" "}
                 <div className="mt-8 w-full flex px-5 gap-[11px]">
-
                   <div className="w-1/2">
                     <div className="mb-2 w-full !font-medium">
                       {" "}
@@ -523,43 +532,57 @@ const PreApproval = (props) => {
                     <div class="bg-white flex justify-between ">
                       <div>
                         <div class="text-base font-medium">Date of Birth</div>
-                        <div class="text-gray-500 text-sm">{formatDate(assuredData.birthDate)}</div>
+                        <div class="text-gray-500 text-sm">
+                          {formatDate(assuredData.birthDate)}
+                        </div>
                       </div>
                     </div>
                     <div class="bg-white flex justify-between ">
                       <div>
                         <div class="text-base font-medium">Employee Status</div>
-                        <div class="text-gray-500 text-sm">{assuredData.employmentStatus}</div>
+                        <div class="text-gray-500 text-sm">
+                          {assuredData.employmentStatus}
+                        </div>
                       </div>
                     </div>
                     <div class="bg-white flex justify-between ">
                       <div>
                         <div class="text-base font-medium">Gender</div>
-                        <div class="text-gray-500 text-sm">{assuredData.gender}</div>
+                        <div class="text-gray-500 text-sm">
+                          {assuredData.gender}
+                        </div>
                       </div>
                     </div>
                     <div class="bg-white flex justify-between ">
                       <div>
                         <div class="text-base font-medium">Start Date</div>
-                        <div class="text-gray-500 text-sm">{formatDate(assuredData.startDate)}</div>
+                        <div class="text-gray-500 text-sm">
+                          {formatDate(assuredData.startDate)}
+                        </div>
                       </div>
                     </div>
                     <div class="bg-white flex justify-between ">
                       <div>
                         <div class="text-base font-medium">Policy</div>
-                        <div class="text-gray-500 text-sm">{assuredData.policyStatus}</div>
+                        <div class="text-gray-500 text-sm">
+                          {assuredData.policyStatus}
+                        </div>
                       </div>
                     </div>
                     <div class="bg-white flex justify-between ">
                       <div>
                         <div class="text-base font-medium">End Date</div>
-                        <div class="text-gray-500 text-sm">{formatDate(assuredData.endDate)}</div>
+                        <div class="text-gray-500 text-sm">
+                          {formatDate(assuredData.endDate)}
+                        </div>
                       </div>
                     </div>
                     <div class="bg-white flex justify-between ">
                       <div>
                         <div class="text-base font-medium">Assured ID</div>
-                        <div class="text-gray-500 text-sm">{assuredData.assuredID}</div>
+                        <div class="text-gray-500 text-sm">
+                          {assuredData.assuredID}
+                        </div>
                       </div>
                     </div>
                     <div class="bg-white flex justify-between ">
@@ -578,11 +601,9 @@ const PreApproval = (props) => {
                     </div>
                   </div>
                 )}
-
               </div>
             </div>
           )}
-
         </div>
       ) : (
         <div className="ml-1 w-full pr-[60px] flex flex-col">
