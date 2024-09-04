@@ -1,38 +1,30 @@
-import { useEffect, useState } from "react";
-import { Button, Checkbox } from "antd";
-import {
-  Save,
-  ReceiptText,
-  Trash2,
-  SquarePen,
-  Cross,
-  X,
-  LoaderCircle,
-} from "lucide-react";
-import Avatar from "../public/images/avatar.jpg";
-import Image from "next/image";
-import { Select, DatePicker, Input, Table, Space } from "antd";
-import DataTable from "./DataTable";
-import { Search } from "lucide-react";
-import { formatDate } from "@/utils/utils";
-import { useDispatch, useSelector } from "react-redux";
-import { editCaseDeactive, setClaimNumber } from "./EditInvoiceSlice";
-import DeleteModal from "./Modal"; // Import the Modal component
-import toast from "react-hot-toast";
-import PrintComponentPages from "./PrintForm2";
+'use client'
 import { apiClient } from "@/app/api";
-import Loader from "./loader";
-import PrintParentComponent from "./PrintParentComponent";
-import { addClaimNumber, editCaseActive } from "../components/EditInvoiceSlice";
+import { formatDate } from "@/utils/utils";
+import { Button, Checkbox, Input, Select, Space, Table } from "antd";
+import {
+    ReceiptText,
+    Save,
+    Search,
+    SquarePen,
+    Trash2,
+    X
+} from "lucide-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 import Modal from "react-responsive-modal";
-
-function InsertClaim({
-  session,
-  setInsertClaim,
-  setPrintClaim,
-  printClaim,
-}) {
+import Avatar from "../../public/images/avatar.jpg";
+import { editCaseDeactive,editCaseActive,addClaimNumber } from "@/components/EditInvoiceSlice";
+import DeleteModal from "@/components/Modal"; // Import the Modal component
+import PrintParentComponent from "@/components/PrintParentComponent";
+import Loader from "@/components/loader";
+import { useSession } from "next-auth/react";
+function InsertClaim() {
   const dispatch = useDispatch();
+  const { data: session } = useSession();
+  const [claim, setInsertClaim] = useState(false)
   const claimNumber = useSelector((state) => state.editCase?.claimNo?.trim()); // Ensure the slice name is correct
   dispatch(editCaseDeactive());
   // const claimNumber = useSelector((state) => state.editCase.claimNumber);
@@ -44,7 +36,7 @@ function InsertClaim({
   const [isNotAvailable, setIsNotAvailable] = useState(false);
   const [pageIndex, setPageIndex] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-
+const [printClaim,setPrintClaim] = useState(false)
   const [loading, setLoading] = useState(false);
   const [claimLoad, setClaimLoad] = useState(false);
   const [claimSubmitted, setClaimSubmitted] = useState(false);
@@ -740,12 +732,15 @@ function InsertClaim({
     const value = e.target.value;
     setClaimNumberInput(value);
   };
+  const updateClaimStatus = ()=>{
+    setPrintClaim(false)
+  }
   return (
     <>
       <Loader loading={loading} />{" "}
-      {!printClaim ? (
+     
         <div className="mt-[10px] flex flex-col w-full">
-          <div className="font-medium text-2xl">Search User ID</div>
+          <div className="font-medium text-2xl">Search Claim No</div>
           <div className="flex mt-2 pr-[60px] ">
             <div className="flex justify-between w-full ">
               <div className="flex">
@@ -1128,15 +1123,16 @@ function InsertClaim({
             </div>
           )}
         </div>
-      ) : (
-        <div className="w-full flex justify-center">
+    {printClaim && <div className="w-full flex justify-center">
           <PrintParentComponent
-            setPrintClaim={setPrintClaim}
+          onclick = {updateClaimStatus}
+            // setPrintClaim={setPrintClaim}
             data={data}
             session={session}
           />
-        </div>
-      )}
+        </div> }
+        
+     
       <Modal
         open={submitConfirmation}
         center

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "antd";
 import PrintComponent from "./PrintForm";
 
-function PrintParentComponent({ setPrintClaim, data, session }) {
+function PrintParentComponent({ onclick, data, session }) {
     const [formOne, setFormOne] = useState(false)
     const [formTwo, setFormTwo] = useState(false)
     return (
@@ -27,7 +27,9 @@ function PrintParentComponent({ setPrintClaim, data, session }) {
                 Open Form 2
             </Button>
             <Button
-                onClick={() => setPrintClaim(false)}
+               onClick={() => {
+                onclick(); // Ensure this triggers the passed function
+            }}
                 type="primary"
                 htmlType="submit"
                 className="bg-[#11349326] w-[160px] border-none ml-2.5 text-black h-[48px] font-inter font-semibold text-base"

@@ -35,7 +35,7 @@ function HeaderBar() {
 
   return (
     <div
-      className={`flex overflow-auto w-full items-center my-3 top-0 ${
+      className={`flex items-center my-3 top-0 ${
         collapsed ? "ml-[70px]" : "ml-[280px]"
       }  h-[70px]`}
     >

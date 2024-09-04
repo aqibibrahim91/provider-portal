@@ -8,14 +8,20 @@ import { apiClient } from "@/app/api";
 import Loader from "./loader";
 import Dashboard from "./Dashboard";
 
-function BatchData({ batch, setBatch, batchNumber, session,setDetailsBit, detailsBit }) {
+function BatchData({  batchNumber, session,onCloseBatch }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState();
   const [pageSize, setPageSize] = useState(10);
   const [pageIndex, setPageIndex] = useState(1);
   const [totalCount, setTotalCount] = useState(0)
   const [back,setBack] = useState(false);
-
+  const handleBackToDashboard = () => {
+    if (onCloseBatch) {
+        onCloseBatch(); // Safely call onCloseBatch if it exists
+    } else {
+        console.error("onCloseBatch function is not passed or undefined");
+    }
+};
   const columns = [
     {
       title: "Sre#",
@@ -105,13 +111,7 @@ function BatchData({ batch, setBatch, batchNumber, session,setDetailsBit, detail
   }
   
   return (
-    back ? (
-      <Dashboard
-        setDetailsBit={setDetailsBit}
-        detailsBit={detailsBit}
-        session={session}
-      />
-    ) : (
+    (
       < div className="ml-1 w-full lg:pr-[60px] flex flex-col" >
         <Loader loading={loading} />
         {
@@ -120,7 +120,7 @@ function BatchData({ batch, setBatch, batchNumber, session,setDetailsBit, detail
               <div>
                 <Button
                   className=" w-[212px] border-none h-[35px] font-inter text-base"
-                  onClick={()=>{setBack(true)}}
+                  onClick={handleBackToDashboard}
                 >
                   <ArrowLeft />
                   Back to Dashboard
@@ -189,7 +189,7 @@ function BatchData({ batch, setBatch, batchNumber, session,setDetailsBit, detail
               <div className="flex items-center">
                 <Button
                   type="primary"
-                  onClick={() => setBatch(false)}
+                  onClick={handleBackToDashboard}
                   htmlType="submit"
                   className="bg-[#113493] w-[212px] mt-3 border-none ml-2.5 text-white h-[48px] font-inter !font-medium text-base"
                 >
