@@ -10,3 +10,16 @@
 .ant-table-row{
     cursor: pointer !important;
 }
+
+
+@media print {
+    .claims-barcode {
+      display: block !important;
+    }
+  }
+  
+  @media screen {
+    .claims-barcode {
+      display: none;
+    }
+  }
