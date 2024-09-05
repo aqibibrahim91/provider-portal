@@ -55,6 +55,7 @@ function HeaderBar() {
           onClick={() => {
             dispatch(HeaderSearchActive());
             dispatch(setSearchID(searchInput));
+            router.push(`/IdSearch`);
           }}
         >
           <Search className="h-5 w-5" />
