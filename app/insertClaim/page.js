@@ -835,11 +835,11 @@ function InsertClaim() {
                             {data?.gender}
                           </p>
                         </div>{" "}
-                        <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] w-[75px] h-[28px] rounded-md align-middle items-center">
+                        <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] max-w-[75px] h-[28px] rounded-md align-middle items-center">
                           {data?.employmentStatus ? (
                             <p className="text-sm font-medium text-white">
                               {" "}
-                              In Active
+                              {data?.employmentStatus}
                             </p>
                           ) : (
                             ""

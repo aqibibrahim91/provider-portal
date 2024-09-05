@@ -14,9 +14,10 @@ import {
 } from "../components/EditInvoiceSlice";
 import ReactToPrint from "react-to-print";
 import Barcode from "react-barcode";
+import { useRouter } from "next/navigation";
 
 
-function BatchData({ batch, setBatch, batchNumber, session, setDetailsBit, detailsBit, onCloseBatch }) {
+function BatchData({ batch, batchNumber, session, setDetailsBit, detailsBit, onCloseBatch,setShowBatch }) {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState();
     const [pageSize, setPageSize] = useState(10);
@@ -33,6 +34,7 @@ function BatchData({ batch, setBatch, batchNumber, session, setDetailsBit, detai
             console.error("onCloseBatch function is not passed or undefined");
         }
     };
+    const router = useRouter();
 
     const columns = [
         {
@@ -170,9 +172,12 @@ function BatchData({ batch, setBatch, batchNumber, session, setDetailsBit, detai
         setPageIndex(pagination.current)
     }
     const handleRowClick = (record) => {
-        console.log("record: ", record)
         dispatch(editCaseActive());
         dispatch(addClaimNumber(record.claimNo));
+        router.push("/insertClaim")
+    }
+    const handleBackClick = () => {
+        setShowBatch(false)
     }
 
     return (
@@ -185,7 +190,7 @@ function BatchData({ batch, setBatch, batchNumber, session, setDetailsBit, detai
                             <div>
                                 <Button
                                     className=" w-[212px] border-none h-[35px] font-inter text-base"
-                                    onClick={() => { setBack(true) }}
+                                    onClick={() => { handleBackClick(true) }}
                                 >
                                     <ArrowLeft />
                                     Back to Dashboard
@@ -194,13 +199,6 @@ function BatchData({ batch, setBatch, batchNumber, session, setDetailsBit, detai
                             <div className="flex items-center justify-between">
                                 <div className="font-medium text-2xl">Batch Data</div>
                                 <div className="flex items-center">
-                                    {/* <Button
-                    type="primary"
-                    htmlType="submit"
-                    className="bg-[#113493] w-[212px] border-none ml-2.5 text-white h-[48px] font-inter !font-medium text-base"
-                  >
-                    Print Report
-                  </Button> */}
                                     <ReactToPrint
                                         trigger={() => (
                                             <div className="flex  ">
