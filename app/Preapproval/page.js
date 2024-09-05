@@ -1,15 +1,16 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import { Table, Button, Space, DatePicker, Input, Select } from "antd";
 import { Trash2, SquarePen, Search } from "lucide-react";
 import { apiClient } from "@/app/api";
-import Loader from "./loader";
+import Loader from "@/components/loader";
 import { formatDate } from "@/utils/utils";
 import toast from "react-hot-toast";
 import moment from "moment"; // Import moment
 import { useSession } from "next-auth/react";
 
 const PreApproval = (props) => {
-  const { data: session } = useSession;
+  const { data: session } = useSession();
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [newCase, setNewCase] = useState(false);
   const [data, setData] = useState([]);
