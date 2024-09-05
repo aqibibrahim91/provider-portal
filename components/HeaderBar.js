@@ -10,11 +10,12 @@ import {
   setSearchID,
   HeaderSearchActive,
 } from "../components/EditInvoiceSlice";
+import { useRouter } from "next/navigation";
 
 function HeaderBar() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const collapsed = useSelector((state) => state.editCase.collapsed);
-  console.log(collapsed, "pppop");
   const [claimNumber, setClaimNumberInput] = useState("");
   const [searchInput, setSearchInput] = useState("");
 
@@ -71,6 +72,7 @@ function HeaderBar() {
           onClick={() => {
             dispatch(editCaseActive());
             dispatch(addClaimNumber(claimNumber));
+            router.push(`/insertClaim`);
           }}
           className="bg-[#113493] border-none ml-2.5 text-white h-[46px] w-[46px] font-inter"
         >
