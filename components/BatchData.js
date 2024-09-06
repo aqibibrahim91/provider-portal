@@ -76,7 +76,7 @@ function BatchData({ batch, batchNumber, session, setDetailsBit, detailsBit, onC
             key: "status",
             render: (_, record) => (
                 <>
-                    <div className={`text-center ${record.isSubmitted && "text-[#ef4444]"}`}>{record.isSubmitted ? "Submitted" : "Open"}</div>
+                    <div className={`text-center ${record.isSubmitted && "text-[#1e930b]"}`}>{record.isSubmitted ? "Submitted" : "Open"}</div>
                     <div className="text-center text-[#ef4444]	 font-bold">{record.isSubmitted ? "" : getRemainingTime(record)}</div>
                 </>
             )

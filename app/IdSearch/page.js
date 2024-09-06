@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSession } from "next-auth/react";
 import { addClaimNumber,setSearchID } from "@/components/EditInvoiceSlice";
+import { useRouter } from "next/navigation";
 
 function IDSearch() {
   const dispatch = useDispatch();
@@ -25,6 +26,8 @@ function IDSearch() {
   const [assuredID, setAssuredID] = useState();
   const [insertResponse, setInsertResponse] = useState("");
   const [assuredIDNew, setAssuredIDNew] = useState("");
+  const router = useRouter();
+
   const fetchData = async () => {
     if (!searchHeaderValue) {
       return;
@@ -97,6 +100,7 @@ function IDSearch() {
         setInsertResponse(text?.successResponse);
         setInsertClaim(true);
         dispatch(addClaimNumber(text?.successResponse?.claimNumber));
+        router.push("/insertClaim")
       }
     } else {
       console.warn("Assured ID is required");
