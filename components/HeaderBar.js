@@ -20,9 +20,7 @@ function HeaderBar() {
   const [searchInput, setSearchInput] = useState("");
 
   const handleSignOut = async () => {
-    await signOut({
-      redirect: "/secure/login", // Redirect to home or login page after sign-out
-    });
+    await signOut({ callbackUrl: "/login", redirect: true });
   };
 
   const handleClaimNumberChange = (e) => {

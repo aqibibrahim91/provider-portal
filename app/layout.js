@@ -5,7 +5,7 @@ import "@/styles/globals.css";
 import HeaderBar from "@/components/HeaderBar";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth/next";
-import Login from "./secure/login/page";
+import Login from "./login/page";
 import { Toaster } from "react-hot-toast";
 import ReduxLayout from "./ReduxLayout";
 import "react-responsive-modal/styles.css";

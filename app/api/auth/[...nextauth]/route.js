@@ -10,6 +10,7 @@ export const authOptions = {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials) {
         try {
           const payload = {
@@ -26,17 +27,18 @@ export const authOptions = {
           );
 
           if (!res.ok) {
-            throw new Error(`HTTP error! Status: ${res.status}`);
+            toast.error("There is some problem");
+            throw new Error("Invalid Credentials");
           }
 
           const user = await res.json();
-          console.log(user, "pouse");
           if (user && user?.isRequestSuccessful) {
             const userObj = {
               name: user?.successResponse?.providersUser?.uName,
               image: user?.successResponse?.token,
               email: user?.successResponse?.providersUser?.providerID,
             };
+
             return userObj;
           } else {
             console.error("Invalid response from server:", user);
@@ -59,6 +61,7 @@ export const authOptions = {
       }
       return token;
     },
+
     async session({ session, token }) {
       if (token) {
         session.user.username = token.username;
@@ -69,7 +72,7 @@ export const authOptions = {
     },
   },
   pages: {
-    signIn: "/secure/login",
+    signIn: "/login",
   },
   secret: "MgeJInQGmzVFvhxack/ZMdlzwz5ZBGl7oB8J2lN4J0E=",
 };
