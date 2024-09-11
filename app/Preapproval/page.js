@@ -33,6 +33,8 @@ const PreApproval = (props) => {
   const [dischargeError, setDischargeError] = useState(false);
   const [caseDateError, setCaseDateError] = useState(false);
   const [caseNumber, setCaseNumber] = useState("");
+  const [pageIndex, setPageIndex] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     getPreApprovalData();
@@ -86,7 +88,7 @@ const PreApproval = (props) => {
     const token = session?.user?.image;
     setLoad(true);
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/PreApproval/GetAll?pID=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/PreApproval/GetAll?pID=${id}&pageNumber=${pageIndex}&pageSize=${10}`,
       {
         method: "GET",
         headers: {
@@ -112,6 +114,7 @@ const PreApproval = (props) => {
       const result = JSON.parse(text);
       console.log("API Response:", result);
       setData(result?.successResponse);
+      setTotalCount(result.totalCount);
     } catch (jsonError) {
       console.error("Error parsing JSON response:", jsonError);
     }
@@ -290,6 +293,10 @@ const PreApproval = (props) => {
       </div>
     </div>
   );
+
+  const handleDataChange = (pagination) => {
+    setPageIndex(pagination.current);
+  };
 
   return (
     <>
@@ -634,7 +641,12 @@ const PreApproval = (props) => {
             onRow={(record) => ({
               onClick: () => toggleRowExpansion(record.caseNo),
             })}
+            pagination={{
+              current: pageIndex,
+              total: totalCount, // total count returned from backend
+            }}
           />
+
         </div>
       )}
     </>

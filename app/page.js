@@ -2,7 +2,7 @@ import Header from "@/components/header";
 import Sidebar from "../components/sidebar";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth/next";
-import Login from "./secure/login/page";
+import Login from "./login/page";
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 import { redirect } from "next/navigation";

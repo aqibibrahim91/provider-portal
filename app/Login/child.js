@@ -1,46 +1,107 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import logo from "../../../public/images/logo.png";
+import logo from "../../public/images/logo.png";
 import { Input, Button, Form } from "antd";
 import { signIn } from "next-auth/react";
-import { redirect, useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { getServerSession } from "next-auth/next";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
-  const router = useRouter();
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const router = useRouter();
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
-
   const handleLogin = async (values) => {
     setIsSubmitting(true);
+
     try {
       const res = await signIn("credentials", {
         username: values.email,
         password: values.password,
         redirect: true,
+        callbackUrl: "/Dashboard",
       });
-      if (res.status == 200) {
-        redirect("/");
-      } else {
-        toast.error("Invalid Username or Passsword");
-        // Handle invalid credentials
+
+      if (res?.status === 200 || res.ok) {
+        router.push("/Dashboard");
+      } else if (!res?.status === 200 || !res.ok) {
+        toast.error("Invalid Username or Password");
         console.error(res.error || "Invalid credentials");
+      } else {
+        toast.error("Unexpected login error. Please try again.");
+        console.error("Unexpected response:", res);
       }
     } catch (error) {
-      // Handle other errors
-      console.error("Login error:", error);
+      if (error.response) {
+        toast.error(
+          `Login failed: ${error.response.data.message || error.message}`
+        );
+        console.error("Response error:", error.response);
+      } else if (error.request) {
+        toast.error(
+          "Network error. Please check your connection and try again."
+        );
+        console.error("Network error:", error.request);
+      } else {
+        console.error("Login error:", error.message);
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // const handleLogin = async (values) => {
+  //   setIsSubmitting(true);
+
+  //   try {
+  //     // Attempt to log in using the credentials
+  //     const res = await signIn("credentials", {
+  //       username: values.email,
+  //       password: values.password,
+  //       redirect: false, // Set to false to handle redirect manually
+  //       callbackUrl: "/Dashboard",
+  //     });
+
+  //     if (res?.status === 200 || res.ok) {
+  //       // Redirect to dashboard on successful login
+  //       router.push("/Dashboard", undefined, { shallow: false });
+  //     } else if (res?.error) {
+  //       // Handle specific credential error
+  //       toast.error("Invalid Username or Password");
+  //       console.error(res.error || "Invalid credentials");
+  //     } else {
+  //       // Handle unexpected response structure
+  //       toast.error("Unexpected login error. Please try again.");
+  //       console.error("Unexpected response:", res);
+  //     }
+  //   } catch (error) {
+  //     // Handle network or other unexpected errors
+  //     if (error.response) {
+  //       // If the error is related to the response from the server
+  //       toast.error(
+  //         `Login failed: ${error.response.data.message || error.message}`
+  //       );
+  //       console.error("Response error:", error.response);
+  //     } else if (error.request) {
+  //       // If the request was made but no response received (e.g., network issue)
+  //       toast.error(
+  //         "Network error. Please check your connection and try again."
+  //       );
+  //       console.error("Network error:", error.request);
+  //     } else {
+  //       // Any other kind of unexpected error
+  //       toast.error("Login failed. Please try again.");
+  //       console.error("Login error:", error.message);
+  //     }
+  //   } finally {
+  //     setIsSubmitting(false); // Reset the submitting state after everything
+  //   }
+  // };
 
   return (
     <div className="flex justify-center items-center align-middle h-screen">

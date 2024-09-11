@@ -10,18 +10,17 @@ import {
   setSearchID,
   HeaderSearchActive,
 } from "../components/EditInvoiceSlice";
+import { useRouter } from "next/navigation";
 
 function HeaderBar() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const collapsed = useSelector((state) => state.editCase.collapsed);
-  console.log(collapsed, "pppop");
   const [claimNumber, setClaimNumberInput] = useState("");
   const [searchInput, setSearchInput] = useState("");
 
   const handleSignOut = async () => {
-    await signOut({
-      redirect: "/secure/login", // Redirect to home or login page after sign-out
-    });
+    await signOut({ callbackUrl: "/login", redirect: true });
   };
 
   const handleClaimNumberChange = (e) => {
@@ -54,6 +53,7 @@ function HeaderBar() {
           onClick={() => {
             dispatch(HeaderSearchActive());
             dispatch(setSearchID(searchInput));
+            router.push(`/IdSearch`);
           }}
         >
           <Search className="h-5 w-5" />
@@ -71,6 +71,7 @@ function HeaderBar() {
           onClick={() => {
             dispatch(editCaseActive());
             dispatch(addClaimNumber(claimNumber));
+            router.push(`/insertClaim`);
           }}
           className="bg-[#113493] border-none ml-2.5 text-white h-[46px] w-[46px] font-inter"
         >

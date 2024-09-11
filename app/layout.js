@@ -5,12 +5,13 @@ import "@/styles/globals.css";
 import HeaderBar from "@/components/HeaderBar";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth/next";
-import Login from "./secure/login/page";
+import Login from "./login/page";
 import { Toaster } from "react-hot-toast";
 import ReduxLayout from "./ReduxLayout";
-import 'react-responsive-modal/styles.css';
+import "react-responsive-modal/styles.css";
 import IdleLogout from "./IdeLogout";
 import ClientLayout from "./ClientLayout";
+import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -48,21 +49,19 @@ export default async function RootLayout({ children }) {
         />
       </head>
       <body>
+        <NextTopLoader color="#113493" height={4} showSpinner={true} />
         <ClientLayout session={session}>
           <Toaster position="top-right" />
           <ReduxLayout>
             {session?.user?.name ? (
               <div className="flex h-screen font-inter">
                 <Sidebar session={session} />
-                
 
-             
-             
                 <div className="flex flex-col w-full">
-              <HeaderBar />
-              <div className="flex-grow px-3 overflow-auto">{children}</div>
-            </div>
-            </div>
+                  <HeaderBar />
+                  <div className="flex-grow px-3 overflow-auto">{children}</div>
+                </div>
+              </div>
             ) : (
               <div className="overflow-auto w-full h-full flex justify-center items-center">
                 <Login />

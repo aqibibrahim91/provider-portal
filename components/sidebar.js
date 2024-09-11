@@ -74,16 +74,14 @@ const Sidebar = ({ session }) => {
       return newState;
     });
   };
-
   const handleClick = (key, href) => {
-    setSelectedKey(key);
     setPrintClaim(false);
-    router.push(href); // Navigate to the selected page
+    router.replace(href);
+    setSelectedKey(key);
   };
 
   const items = [
     {
-      
       label: <Link href="/Dashboard">Dashboard</Link>,
       icon: <File />,
       key: "1",
@@ -130,7 +128,9 @@ const Sidebar = ({ session }) => {
   return (
     <div className="flex">
       <div
-        className={`z-10 h-screen bg-white flex flex-col font-inter ${collapsed ? "w-20" : "w-[280px]"} transition-width duration-300`}
+        className={`z-10 h-screen bg-white flex flex-col font-inter ${
+          collapsed ? "w-20" : "w-[280px]"
+        } transition-width duration-300`}
       >
         <div className={` ${collapsed ? "" : "w-[280px]"}`}>
           <div className="flex py-7">
@@ -159,13 +159,15 @@ const Sidebar = ({ session }) => {
                 <div
                   key={item.key}
                   onClick={() => handleClick(item.key, item.href)}
-                  className={`flex items-center text-base gap-3 cursor-pointer ${collapsed
+                  className={`flex items-center text-base gap-3 cursor-pointer ${
+                    collapsed
                       ? "w-20 justify-center items-center align-middle flex"
                       : "w-[280px] pl-[40px]"
-                    } ${selectedKey === item.key
+                  } ${
+                    selectedKey === item.key
                       ? "bg-[#113493] text-white"
                       : "bg-white text-black"
-                    }`}
+                  }`}
                   style={{ height: "80px", opacity: "0.8" }}
                 >
                   {item.icon}
@@ -177,7 +179,9 @@ const Sidebar = ({ session }) => {
             </div>
             <Button
               type="text"
-              className={`flex mt-2 absolute ${collapsed ? "-top-6 left-2" : "-top-16 right-0"}`}
+              className={`flex mt-2 absolute ${
+                collapsed ? "-top-6 left-2" : "-top-16 right-0"
+              }`}
               onClick={() => toggleCollapsed()}
             >
               <Menu className="h-8 w-7" />

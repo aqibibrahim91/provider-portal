@@ -143,6 +143,8 @@ export default function Dashboard() {
         batchNumber: item.batchNo.trim(),
         claims: item.claimsNo,
         sumOfClaims: item.sumOfClaim,
+        createdDate: item.createdDate,
+        insuranceCompany: item.insuranceCompany,
         status:
           item.status === "Auditing"
             ? "Auditing"
@@ -162,7 +164,7 @@ export default function Dashboard() {
       title: "#",
       dataIndex: "id",
       key: "id",
-      width: "20%",
+      width: "5%",
     },
     {
       title: "Batch #",
@@ -171,9 +173,21 @@ export default function Dashboard() {
       width: "20%",
     },
     {
+      title: "Insurance Company",
+      dataIndex: "insuranceCompany",
+      key: "insuranceCompany",
+      width: "20%",
+    },
+    {
       title: "Claims",
       dataIndex: "claims",
       key: "claims",
+      width: "20%",
+    },
+    {
+      title: "Created Date",
+      dataIndex: "createdDate",
+      key: "createdDate",
       width: "20%",
     },
     {
@@ -262,6 +276,7 @@ export default function Dashboard() {
           batchNumber={selectedBatchNumber}
           session={session}
           onCloseBatch={handleCloseBatch}
+          setShowBatch={setShowBatch}
         />
       ) : showDetails ? (
         <HealthCareDetails onClose={handleCloseDetails} session={session} />
