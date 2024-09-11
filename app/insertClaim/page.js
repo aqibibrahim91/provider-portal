@@ -831,21 +831,19 @@ function InsertClaim() {
                       <div className="flex gap-2.5 ">
                         <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] max-w-[65px] h-[28px] rounded-md align-middle items-center">
                           <p className="text-sm font-medium text-white">
-                            {" "}
                             {data?.gender}
                           </p>
                         </div>{" "}
-                        <div className="flex justify-end bg-[#3056D3] px-2 py-[3px] max-w-[75px] h-[28px] rounded-md align-middle items-center">
+                        <div className="flex justify-center w-28 bg-[#3056D3] px-2 py-[3px] max-w-[85px] h-[28px] rounded-md align-middle items-center">
                           {data?.employmentStatus ? (
                             <p className="text-sm font-medium text-white">
-                              {" "}
                               {data?.employmentStatus}
                             </p>
                           ) : (
                             ""
                           )}{" "}
                         </div>{" "}
-                        <div className="flex justify-center bg-[#3056D3] px-2 py-[3px] w-24 h-[28px] rounded-md align-middle items-center">
+                        <div className="flex justify-center bg-[#3056D3] px-2 py-[3px] w-[100px] h-[28px] rounded-md align-middle items-center">
                           {data?.outPatient ? (
                             <p className="text-sm font-medium text-white">
                               Out Patient
