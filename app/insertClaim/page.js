@@ -70,6 +70,10 @@ function InsertClaim() {
     diagID: "",
     outPatint: data?.outPatient,
   });
+  const [invoiceNumberError, setInvoiceNumberError] = useState(false);
+  const [treatmentDateError, setTreatmentDateError] = useState(false);
+  const [medicalServiceError, setMedicalServiceError] = useState(false);
+  const [grossError, setGrossError] = useState(false);
 
   const formatDatee = (date) => {
     if (!date) return ""; // Handle case where date might be undefined or null
@@ -91,7 +95,13 @@ function InsertClaim() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "invoiceNumber" && edit) {
+    if(name == "invoiceNumber"){
+      setInvoiceNumberError(false)
+    }
+    if(name == "gross"){
+      setGrossError(false)
+    }
+    if (name == "invoiceNumber" && edit) {
       setFormState((prevState) => ({
         ...prevState,
         orignalInv: value,
@@ -113,8 +123,14 @@ function InsertClaim() {
         [name]: value,
         gross: selected ? selected.price : "",
       }));
+      console.log("selected: ",selected)
+      if(selected && selected.price){
+        console.log("here")
+        setGrossError(false)
+      }
       fetchMedicalServicesByProvider(selected?.value);
     } else {
+      setMedicalServiceError(false)
       const selected = medicalServices.find(
         (service) => service.value === value
       );
@@ -130,8 +146,7 @@ function InsertClaim() {
   const fetchMedicalServicesByProvider = async (value = "") => {
     try {
       const response = await apiClient(
-        `${
-          process.env.NEXT_PUBLIC_API_URL
+        `${process.env.NEXT_PUBLIC_API_URL
         }/api/Claim/GetMedicalServices?providerAccountNumber=${value ?? ""}`,
         {
           method: "GET",
@@ -164,10 +179,8 @@ function InsertClaim() {
   const selectedMedicalService = async (value) => {
     try {
       const response = await apiClient(
-        `${
-          process.env.NEXT_PUBLIC_API_URL
-        }/api/Claim/GetProviderMedicalService?providerID=${id}&medWorkId=${
-          value ?? ""
+        `${process.env.NEXT_PUBLIC_API_URL
+        }/api/Claim/GetProviderMedicalService?providerID=${id}&medWorkId=${value ?? ""
         }`,
         {
           method: "GET",
@@ -197,6 +210,9 @@ function InsertClaim() {
               ...prevState,
               gross: options[0]?.price,
             }));
+            if(options[0]?.price){
+              setGrossError(false)
+            }
           }
         }
       } else {
@@ -224,6 +240,7 @@ function InsertClaim() {
     if (!isNotAvailable) {
       // Set the invoice number to "Not Available" when the checkbox is selected
       setFormState((prev) => ({ ...prev, invoiceNumber: "Not Available" }));
+      setInvoiceNumberError(false)
     } else {
       // Clear the invoice number when the checkbox is deselected
       setFormState((prev) => ({ ...prev, invoiceNumber: "" }));
@@ -292,6 +309,7 @@ function InsertClaim() {
   const isInvalidValue = (value) => {
     return value === null || value === undefined || value === "";
   };
+
   const validateRequest = (request) => {
     if (
       isInvalidValue(request.invoiceNumber) ||
@@ -299,6 +317,18 @@ function InsertClaim() {
       isInvalidValue(request.medicalService) ||
       isInvalidValue(request.gross)
     ) {
+      if (isInvalidValue(request.invoiceNumber)) {
+        setInvoiceNumberError(true)
+      }
+      if (isInvalidValue(request.treatmentDate)) {
+        setTreatmentDateError(true)
+      }
+      if (isInvalidValue(request.medicalService)) {
+        setMedicalServiceError(true)
+      }
+      if (isInvalidValue(request.gross)) {
+        setGrossError(true)
+      }
       return false; // Return false if any value is invalid
     }
 
@@ -470,8 +500,7 @@ function InsertClaim() {
       try {
         setGridLoading(true);
         const response = await apiClient(
-          `${
-            process.env.NEXT_PUBLIC_API_URL
+          `${process.env.NEXT_PUBLIC_API_URL
           }/api/Claim/ShowGridData?claimNumber=${claimNo}&pageIndex=${pageIndex}&pageSize=${10}`,
           {
             method: "GET",
@@ -651,33 +680,33 @@ function InsertClaim() {
     },
     data?.isSubmitted === null
       ? {
-          title: "Actions", // Added title for the actions column
-          key: "action",
-          render: (_, record) => (
-            <Space size="middle">
-              <a>
-                {selectedRow === record.keyRef && edit ? (
-                  <X
-                    className="text-[#2B3F6C]"
-                    onClick={() => handleEditClickEnd(record)}
-                  />
-                ) : (
-                  <SquarePen
-                    className="text-[#2B3F6C]"
-                    onClick={() => handleEditClick(record)}
-                  />
-                )}
-              </a>{" "}
-              <a>
-                <Trash2
-                  className="text-red
-                  "
-                  onClick={() => handleDeleteClick(record)}
+        title: "Actions", // Added title for the actions column
+        key: "action",
+        render: (_, record) => (
+          <Space size="middle">
+            <a>
+              {selectedRow === record.keyRef && edit ? (
+                <X
+                  className="text-[#2B3F6C]"
+                  onClick={() => handleEditClickEnd(record)}
                 />
-              </a>{" "}
-            </Space>
-          ),
-        }
+              ) : (
+                <SquarePen
+                  className="text-[#2B3F6C]"
+                  onClick={() => handleEditClick(record)}
+                />
+              )}
+            </a>{" "}
+            <a>
+              <Trash2
+                className="text-red
+                  "
+                onClick={() => handleDeleteClick(record)}
+              />
+            </a>{" "}
+          </Space>
+        ),
+      }
       : {},
   ];
   const submitClaim = async () => {
@@ -802,9 +831,8 @@ function InsertClaim() {
             </div>{" "}
             <>
               <div
-                className={`flex ${
-                  data?.isSubmitted ? "lg:h-[150px]" : "lg:h-[410px]"
-                }  mt-[22px] pt-5 bg-white rounded-[20px] w-full flex-col`}
+                className={`flex ${data?.isSubmitted ? "lg:h-[150px]" : "lg:h-[410px]"
+                  }  mt-[22px] pt-5 bg-white rounded-[20px] w-full flex-col`}
               >
                 <div className="flex w-full justify-between px-5 ">
                   <div className="lg:w-[70%] lg:h-[115px] pr-[22px]  border-r border-[#E7E7E7] flex flex-col">
@@ -953,7 +981,7 @@ function InsertClaim() {
                                 type="text"
                                 name="invoiceNumber"
                                 placeholder="Enter Invoice#"
-                                className="h-12 px-3 w-full   mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
+                                className={`h-12 px-3 w-full mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7] ${invoiceNumberError && "border-2 border-rose-600"}`}
                                 value={
                                   edit
                                     ? formState.orignalInv
@@ -969,9 +997,10 @@ function InsertClaim() {
                               </div>
                               <input
                                 type="date"
-                                className="h-12 mt-3 px-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
+                                className={`h-12 px-3 w-full mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7] ${treatmentDateError && "border-2 border-rose-600"}`}
                                 value={formatDatee(formState.treatmentDate)}
                                 onChange={(e) => {
+                                  setTreatmentDateError(false);
                                   setFormState((prevState) => ({
                                     ...prevState,
                                     treatmentDate: e.target.value,
@@ -1024,7 +1053,7 @@ function InsertClaim() {
                                     : "Select Medical Service"
                                 }
                                 defaultValue="Select Medical Service"
-                                className="h-12 mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
+                                className={`h-12 mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7] ${medicalServiceError && "border-2 border-rose-600"}`}
                                 options={medicalServices}
                                 loading={loading}
                                 optionFilterProp="label"
@@ -1046,7 +1075,7 @@ function InsertClaim() {
                               name="gross"
                               value={formState.gross}
                               placeholder="Enter Gross"
-                              className="h-12 px-3  mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7]"
+                              className={`h-12 px-3 w-full mt-3 placeholder:text-[#637381] !font-inter rounded-lg text-sm font-medium bg-[#F8FAFC] placeholder:text-[15px] border border-[#E7E7E7] ${grossError && "border-2 border-rose-600"}`}
                               onChange={handleChange}
                               min={0}
                             />
